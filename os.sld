@@ -21,7 +21,6 @@
           make-generic
 
           add-method!
-          add-callable!
 
           name class-of
           direct-superclasses all-superclasses
@@ -30,6 +29,10 @@
           getter setter
           signature
           discriminators
-          methods )
+          methods
+
+          ; Y U NO MACRO?
+          add-callable!
+          effective-function )
 
 )
