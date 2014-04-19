@@ -4,7 +4,6 @@
   ;
   (import (os accessors)
           (os boot initialized-classes)
-          (os callables)
           (os class-of)
           (os generics)
           (os inheritance)
@@ -20,7 +19,8 @@
           make-class
           make-generic
 
-          add-method!
+          define-generic
+          define-method
 
           name class-of
           direct-superclasses all-superclasses
@@ -29,10 +29,6 @@
           getter setter
           signature
           discriminators
-          methods
-
-          ; Y U NO MACRO?
-          add-callable!
-          effective-function )
+          methods )
 
 )

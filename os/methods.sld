@@ -7,9 +7,11 @@
           (only (srfi 95) sort)
           (os accessors)
           (os class-of)
-          (os predicates) )
+          (os instantiation)
+          (os predicates)
+          (os boot class-definitions) )
 
-  (export add-method!)
+  (export add-method! define-method)
 
   (begin
 
@@ -65,4 +67,15 @@
               (else (loop (cdr L)
                           (cdr R)
                           (cdr A) )) ) ) )
+
+    (define-syntax define-method
+      (syntax-rules ()
+        ((_ (generic args ...) (specializers ...) body1 body2 ...)
+         (add-method! generic
+           (make <method>
+             'discriminators: (list specializers ...)
+             'method-body:
+               (lambda (args ...)
+                 body1 body2 ... ) ) ) ) ) )
+
 ) )
