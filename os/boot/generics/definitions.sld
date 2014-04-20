@@ -7,7 +7,14 @@
 
   (export slot-ref-in-class
           slot-set-in-class!
-          slot-bound-in-class? )
+          slot-bound-in-class?
+
+          compute-all-superclasses
+          compute-all-slots
+          compute-effective-slot
+          compute-instance-size
+          finalize-slot-descriptors!
+          compute-direct-slot-accessors )
 
   (begin
 
@@ -16,5 +23,14 @@
     (predefine-generic slot-ref-in-class    ((object) (class) slot-name))
     (predefine-generic slot-set-in-class!   ((object) (class) slot-name value))
     (predefine-generic slot-bound-in-class? ((object) (class) slot-name))
+
+    ; protocols/inheritance
+    ;
+    (predefine-generic compute-all-superclasses      ((class)))
+    (predefine-generic compute-all-slots             ((class)))
+    (predefine-generic compute-effective-slot        ((class) slots))
+    (predefine-generic compute-instance-size         ((class)))
+    (predefine-generic finalize-slot-descriptors!    ((class)))
+    (predefine-generic compute-direct-slot-accessors ((class) (slot)))
 
 ) )
