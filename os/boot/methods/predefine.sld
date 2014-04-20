@@ -26,12 +26,12 @@
 
     (define-syntax predefine-method
       (syntax-rules ()
-        ((_ (generic args ...) (specializers ...) body1 body2 ...)
+        ((_ (generic call-next-method args ...) (specializers ...) body1 body2 ...)
          (generic-add-method! generic
            (make-method
              'discriminators: (list specializers ...)
              'method-body:
-               (lambda (args ...)
+               (lambda (call-next-method args ...)
                  body1 body2 ... ) ) ) ) ) )
 
     (define (initialize-method! method initargs)
@@ -51,10 +51,9 @@
         (generic-effective-function-set! generic
           (lambda args
             (let* ((discriminators (map class-of (discriminator-args generic args)))
-                   (applicable-methods (applicable-methods generic discriminators)) )
-              (if (null? applicable-methods)
-                  (error "no applicable methods" (generic-name-ref generic) args)
-                  (apply (method-body-ref (first applicable-methods)) args) ) ) ) ) ) )
+                   (applicable-methods (applicable-methods generic discriminators))
+                   (effective-method (effective-method applicable-methods)) )
+              (effective-method args) ) ) ) ) )
 
     (define (discriminator-args generic args)
       (let loop ((result '())
@@ -96,5 +95,20 @@
               (else (loop (cdr L)
                           (cdr R)
                           (cdr A) )) ) ) )
+
+    ; always linear combinator
+    (define (effective-method methods)
+      (if (null? methods) (error "no applicable methods")
+          (let ((methods (map method-function methods)))
+            (lambda (args)
+              ((car methods) (cdr methods) args) ) ) ) )
+
+    (define (method-function method)
+      (let ((method-body (method-body-ref method)))
+        (lambda (next-methods args)
+          (apply method-body
+           (if (null? next-methods) #f
+               (lambda () ((car next-methods) (cdr next-methods) args)) )
+           args ) ) ) )
 
 ) )

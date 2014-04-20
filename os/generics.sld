@@ -25,8 +25,9 @@
         ((_ name signature)
          (define name
            (let* ((gf-object (make-generic
-                               'name:      'name
-                               'signature: 'signature ))
+                               'name:             'name
+                               'signature:        'signature
+                               'method-combinator: (make <linear-method-combinator>) ))
                   (gf-wrapper (lambda args
                                 (apply (generic-effective-function-ref gf-object)
                                        args ) )) )

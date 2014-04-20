@@ -33,7 +33,7 @@
 
     ; protocols/slot-access
     ;
-    (predefine-method (slot-ref-in-class object class slot-name)
+    (predefine-method (slot-ref-in-class $ object class slot-name)
                       (<object> <class>)
       (let ((value (cond
                      ((eq? class <class>)          (slot-ref-in-<class> object slot-name))
@@ -68,13 +68,13 @@
              (slot-ref (direct-getter slot)) )
         (slot-ref object) ) )
 
-    (predefine-method (slot-set-in-class! object class slot-name value)
+    (predefine-method (slot-set-in-class! $ object class slot-name value)
                       (<object> <class>)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-set! (direct-setter slot)) )
         (slot-set! object value) ) )
 
-    (predefine-method (slot-bound-in-class? object class slot-name)
+    (predefine-method (slot-bound-in-class? $ object class slot-name)
                       (<object> <class>)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-ref (direct-getter slot)) )
@@ -89,16 +89,16 @@
 
     ; protocols/inheritance
     ;
-    (predefine-method (compute-all-superclasses class) (<class>)
+    (predefine-method (compute-all-superclasses $ class) (<class>)
       ; exclude the class itself from the precendence list
       (cdr (graph-bfs class direct-superclasses eq?)) )
 
-    (predefine-method (compute-all-slots class) (<class>)
+    (predefine-method (compute-all-slots $ class) (<class>)
       (map (lambda (slots)
              (compute-effective-slot class slots) )
         (group-slots-by-name class) ) )
 
-    (predefine-method (compute-effective-slot class slots) (<class>)
+    (predefine-method (compute-effective-slot $ class slots) (<class>)
       (make <effective-slot>
         'name:         (name (car slots))
         'init-keyword: (first-bound 'init-keyword slots)
@@ -132,10 +132,10 @@
 
         (map reverse (hash-table-values hash)) ) )
 
-    (predefine-method (compute-instance-size class) (<class>)
+    (predefine-method (compute-instance-size $ class) (<class>)
       (length (all-slots class)) )
 
-    (predefine-method (finalize-slot-descriptors! class) (<class>)
+    (predefine-method (finalize-slot-descriptors! $ class) (<class>)
       (for-each
         (lambda (slot)
           (let-values (((getter setter) (compute-direct-slot-accessors class slot)))
@@ -143,13 +143,13 @@
             (set-direct-setter! slot setter) ) )
         (all-slots class) ) )
 
-    (predefine-method (compute-direct-slot-accessors class slot)
+    (predefine-method (compute-direct-slot-accessors $ class slot)
                       (<class> <effective-slot>)
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots class))))
         (values (lambda (o)   (primitive-ref  o index))
                 (lambda (o v) (primitive-set! o index v)) ) ) )
 
-    (predefine-method (compute-direct-slot-accessors callable slot)
+    (predefine-method (compute-direct-slot-accessors $ callable slot)
                       (<procedure> <effective-slot>)
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots callable))))
         (values (lambda (o)   (primitive-ref  (object-of o) index))
@@ -158,17 +158,17 @@
 
     ; protocols/generic-calls
     ;
-    (predefine-method (add-method! generic method) (<generic> <method>)
+    (predefine-method (add-method! $ generic method) (<generic> <method>)
       (set-methods! generic (cons method (methods generic)))
       (set-effective-function! generic (compute-effective-function generic)) )
 
-    (predefine-method (compute-effective-function generic) (<generic>)
+    (predefine-method (compute-effective-function $ generic) (<generic>)
       (lambda args
         (let* ((discriminators (map class-of (discriminator-args generic args)))
-               (applicable-methods (find-applicable-methods generic discriminators)) )
-          (if (null? applicable-methods)
-              (error "no applicable methods" (name generic) args)
-              (apply (method-body (first applicable-methods)) args) ) ) ) )
+               (applicable-methods (find-applicable-methods generic discriminators))
+               (combinator (method-combinator generic))
+               (effective-method (compute-effective-method combinator applicable-methods)) )
+          (effective-method args) ) ) )
 
     (define (discriminator-args generic args)
       (let loop ((result '())
@@ -183,7 +183,7 @@
                           (cdr signature)
                           (cdr args) )) ) ) )
 
-    (predefine-method (find-applicable-methods generic classes) (<generic>)
+    (predefine-method (find-applicable-methods $ generic classes) (<generic>)
       (let ((all-methods    (methods generic))
             (applicable?    (lambda (method) (method-applicable? method classes)))
             (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
@@ -193,7 +193,7 @@
       (every instance-of? classes (discriminators method)) )
 
     ; lhs < rhs
-    (predefine-method (more-specific-method? left-m right-m arg-classes)
+    (predefine-method (more-specific-method? $ left-m right-m arg-classes)
                       (<method> <method>)
       (let loop ((L (discriminators left-m))
                  (R (discriminators right-m))
@@ -211,5 +211,20 @@
               (else (loop (cdr L)
                           (cdr R)
                           (cdr A) )) ) ) )
+
+    (predefine-method (compute-effective-method $ combinator methods)
+                      (<linear-method-combinator>)
+      (if (null? methods) (error "no applicable methods")
+          (let ((methods (map compute-method-function methods)))
+            (lambda (args)
+              ((car methods) (cdr methods) args) ) ) ) )
+
+    (predefine-method (compute-method-function $ method) (<method>)
+      (let ((method-body (method-body method)))
+        (lambda (next-methods args)
+          (apply method-body
+           (if (null? next-methods) #f
+               (lambda () ((car next-methods) (cdr next-methods) args)) )
+           args ) ) ) )
 
 ) )

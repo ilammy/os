@@ -19,7 +19,9 @@
           add-method!
           compute-effective-function
           find-applicable-methods
-          more-specific-method? )
+          more-specific-method?
+          compute-effective-method
+          compute-method-function )
 
   (begin
 
@@ -44,5 +46,7 @@
     (predefine-generic compute-effective-function ((generic)))
     (predefine-generic find-applicable-methods    ((generic) classes))
     (predefine-generic more-specific-method?      ((method) (method) classes))
+    (predefine-generic compute-effective-method   ((combinator) methods))
+    (predefine-generic compute-method-function    ((method)))
 
 ) )

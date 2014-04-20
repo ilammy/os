@@ -14,7 +14,9 @@
           direct-<effective-slot>-slots
           direct-<procedure>-slots
           direct-<generic>-slots
-          direct-<method>-slots )
+          direct-<method>-slots
+          direct-<method-combinator>-slots
+          direct-<linear-method-combinator>-slots )
 
   (begin
 
@@ -75,6 +77,10 @@
                    'init-keyword: 'signature:
                    'getter:        signature )
 
+        (make-slot 'name:         'method-combinator
+                   'init-keyword: 'method-combinator:
+                   'getter:        method-combinator )
+
         (make-slot 'name:         'methods
                    'getter:        methods )
 
@@ -91,6 +97,10 @@
 
     (define direct-<procedure>-slots '())
 
+    (define direct-<method-combinator>-slots '())
+
+    (define direct-<linear-method-combinator>-slots '())
+
     (define all-<object>-slots         direct-<object>-slots)
     (define all-<class>-slots          (append all-<object>-slots direct-<class>-slots))
     (define all-<slot>-slots           (append all-<object>-slots direct-<slot>-slots))
@@ -99,13 +109,19 @@
     (define all-<generic>-slots        (append all-<object>-slots direct-<generic>-slots))
     (define all-<method>-slots         (append all-<object>-slots direct-<method>-slots))
 
+    (define all-<method-combinator>-slots        (append all-<object>-slots
+                                                         direct-<method-combinator>-slots ))
+    (define all-<linear-method-combinator>-slots (append all-<method-combinator>-slots
+                                                         direct-<linear-method-combinator>-slots ))
     (define (all-slots-of class)
-      (cond ((eq? class <object>)         all-<object>-slots)
-            ((eq? class <class>)          all-<class>-slots)
-            ((eq? class <slot>)           all-<slot>-slots)
-            ((eq? class <effective-slot>) all-<effective-slot>-slots)
-            ((eq? class <procedure>)      all-<procedure>-slots)
-            ((eq? class <generic>)        all-<generic>-slots)
-            ((eq? class <method>)         all-<method>-slots) ) )
+      (cond ((eq? class <object>)                   all-<object>-slots)
+            ((eq? class <class>)                    all-<class>-slots)
+            ((eq? class <slot>)                     all-<slot>-slots)
+            ((eq? class <effective-slot>)           all-<effective-slot>-slots)
+            ((eq? class <procedure>)                all-<procedure>-slots)
+            ((eq? class <generic>)                  all-<generic>-slots)
+            ((eq? class <method>)                   all-<method>-slots)
+            ((eq? class <method-combinator>)        all-<method-combinator>-slots)
+            ((eq? class <linear-method-combinator>) all-<linear-method-combinator>-slots) ) )
 
 ) )

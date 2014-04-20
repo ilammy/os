@@ -11,7 +11,9 @@
           <effective-slot>
           <procedure>
           <generic>
-          <method> )
+          <method>
+          <method-combinator>
+          <linear-method-combinator> )
 
   (begin
 
@@ -30,5 +32,10 @@
     (init-class! <procedure> (<object>)    direct-<procedure>-slots)
     (init-class! <generic> (<procedure>)   direct-<generic>-slots)
     (init-class! <method> (<object>)       direct-<method>-slots)
+
+    (init-class! <method-combinator> (<object>)
+      direct-<method-combinator>-slots )
+    (init-class! <linear-method-combinator> (<method-combinator>)
+      direct-<linear-method-combinator>-slots )
 
 ) )

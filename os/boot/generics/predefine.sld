@@ -13,20 +13,25 @@
 
   (begin
 
-    (define <generic>-instance-size 4)
+    (define <generic>-instance-size                  5)
+    (define <linear-method-combinator>-instance-size 0)
 
     (define (make-generic . initargs)
       (let ((generic (make-primitive <generic> <generic>-instance-size)))
         (initialize-generic! generic initargs)
         generic ) )
 
+    (define (make-default-method-combinator)
+      (make-primitive <linear-method-combinator> <linear-method-combinator>-instance-size) )
+
     (define-syntax predefine-generic
       (syntax-rules ()
         ((_ name signature)
          (define name
            (let* ((gf-object (make-generic
-                               'name:      'name
-                               'signature: 'signature ))
+                               'name:             'name
+                               'signature:        'signature
+                               'method-combinator: (make-default-method-combinator) ))
                   (gf-wrapper (lambda args
                                 (apply (generic-effective-function-ref gf-object)
                                        args ) )) )
@@ -37,8 +42,9 @@
       (for-each-initarg
         (lambda (key value)
           (case key
-            ((name:)      (generic-name-set!      generic value))
-            ((signature:) (generic-signature-set! generic value))
+            ((name:)              (generic-name-set!              generic value))
+            ((signature:)         (generic-signature-set!         generic value))
+            ((method-combinator:) (generic-method-combinator-set! generic value))
             (else (error "unknown init keyword" "<generic>" key)) ) )
         initargs )
 

@@ -38,6 +38,8 @@
           generic-name-set!
           generic-signature-ref
           generic-signature-set!
+          generic-method-combinator-ref
+          generic-method-combinator-set!
           generic-methods-ref
           generic-methods-set!
           generic-effective-function-ref
@@ -98,9 +100,11 @@
          generic-name-set! )
       (1 generic-signature-ref
          generic-signature-set! )
-      (2 generic-methods-ref
+      (2 generic-method-combinator-ref
+         generic-method-combinator-set! )
+      (3 generic-methods-ref
          generic-methods-set! )
-      (3 generic-effective-function-ref
+      (4 generic-effective-function-ref
          generic-effective-function-set! ) )
 
     (define-primitive-accessors

@@ -7,4 +7,6 @@
   (export add-method!
             compute-effective-function
               find-applicable-methods
-                more-specific-method? ) )
+                more-specific-method?
+              compute-effective-method
+                compute-method-function ) )
