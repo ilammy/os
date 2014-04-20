@@ -7,10 +7,9 @@
           (os boot specialized-generics)
           (os class-of)
           (os generics)
-          (os inheritance)
-          (os instantiation)
           (os methods)
-          (os slot-access) )
+          (os slot-access)
+          (os protocols instantiation) )
 
   (export <object> <class>
           <slot> <effective-slot>
@@ -18,8 +17,6 @@
           <procedure>
 
           make
-          make-class
-          make-generic
 
           define-generic
           define-method

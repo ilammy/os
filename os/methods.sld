@@ -3,9 +3,9 @@
   ;   Generic maintenance
   ;
   (import (scheme base)
-          (os instantiation)
           (os boot classes definitions)
-          (os protocols generic-calls) )
+          (os protocols generic-calls)
+          (os protocols instantiation) )
 
   (export add-method! define-method)
 
@@ -16,9 +16,9 @@
         ((_ (generic call-next-method args ...) (specializers ...) body1 body2 ...)
          (add-method! generic
            (make <method>
-             'discriminators: (list specializers ...)
-             'method-body:
-               (lambda (call-next-method args ...)
-                 body1 body2 ... ) ) ) ) ) )
+             (list 'discriminators: (list specializers ...)
+                   'method-body:
+                     (lambda (call-next-method args ...)
+                       body1 body2 ... ) ) ) ) ) ) )
 
 ) )

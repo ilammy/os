@@ -5,7 +5,11 @@
   (import (scheme base)
           (os boot generics predefine) )
 
-  (export slot-ref-in-class
+  (export make
+          allocate
+          initialize
+
+          slot-ref-in-class
           slot-set-in-class!
           slot-bound-in-class?
 
@@ -24,6 +28,12 @@
           compute-method-function )
 
   (begin
+
+    ; protocols/instantiation
+    ;
+    (predefine-generic make       ((class) initargs))
+    (predefine-generic allocate   ((class) initargs))
+    (predefine-generic initialize ((object) initargs))
 
     ; protocols/slot-access
     ;

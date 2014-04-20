@@ -8,7 +8,7 @@
           (os accessors)
           (os callables)
           (os class-of)
-          (os instantiation)
+          (os initargs)
           (os predicates)
           (os primitives)
           (os slot-access)
@@ -30,6 +30,50 @@
           compute-direct-slot-accessors )
 
   (begin
+
+    ; protocols/instantiation
+    ;
+    (predefine-method (make $ class initargs) (<class>)
+      (initialize (allocate class initargs) initargs) )
+
+    (predefine-method (allocate $ class initargs) (<class>)
+      (make-primitive class (instance-size class)) )
+
+    (predefine-method (initialize $ object initargs) (<object>)
+      (for-each
+        (lambda (slot)
+          (init-slot-with-initargs! slot object initargs) )
+        (all-slots (class-of object)) )
+      object )
+
+    (define (init-slot-with-initargs! slot object initargs)
+      (and-let* ((keyword (init-keyword slot)))
+        (let-values (((keyword-found? value) (get-initarg keyword initargs)))
+          (when keyword-found?
+            (let ((slot-set! (direct-setter slot)))
+              (slot-set! object value) ) ) ) ) )
+
+    ; other metaobject initialization
+    ;
+    (predefine-method (initialize call-next-method class initargs) (<class>)
+      (call-next-method)
+
+      (set-all-superclasses! class (compute-all-superclasses class))
+      (set-all-slots!        class (compute-all-slots class))
+      (set-instance-size!    class (compute-instance-size class))
+      (finalize-slot-descriptors! class)
+
+      class )
+
+    (predefine-method (initialize call-next-method generic initargs) (<generic>)
+      (call-next-method)
+
+      (generic-methods-set! generic '())
+      (generic-effective-function-set! generic
+        (lambda args
+          (error "no applicable method" (generic-name-ref generic) args) ) )
+
+      generic )
 
     ; protocols/slot-access
     ;
@@ -100,10 +144,10 @@
 
     (predefine-method (compute-effective-slot $ class slots) (<class>)
       (make <effective-slot>
-        'name:         (name (car slots))
-        'init-keyword: (first-bound 'init-keyword slots)
-        'getter:       (first-bound 'getter       slots)
-        'setter:       (first-bound 'setter       slots) ) )
+        (list 'name:         (name (car slots))
+              'init-keyword: (first-bound 'init-keyword slots)
+              'getter:       (first-bound 'getter       slots)
+              'setter:       (first-bound 'setter       slots) ) ) )
 
     (define (first-bound slot-name objects)
       (let ((slot-bound? (lambda (object) (slot-bound? object slot-name))))
