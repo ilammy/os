@@ -33,8 +33,6 @@
           discriminators
           methods
 
-          test-generic
-
           slot-ref
           slot-set! )
 
