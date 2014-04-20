@@ -14,7 +14,12 @@
           compute-effective-slot
           compute-instance-size
           finalize-slot-descriptors!
-          compute-direct-slot-accessors )
+          compute-direct-slot-accessors
+
+          add-method!
+          compute-effective-function
+          find-applicable-methods
+          more-specific-method? )
 
   (begin
 
@@ -32,5 +37,12 @@
     (predefine-generic compute-instance-size         ((class)))
     (predefine-generic finalize-slot-descriptors!    ((class)))
     (predefine-generic compute-direct-slot-accessors ((class) (slot)))
+
+    ; protocols/generic-calls
+    ;
+    (predefine-generic add-method!                ((generic) (method)))
+    (predefine-generic compute-effective-function ((generic)))
+    (predefine-generic find-applicable-methods    ((generic) classes))
+    (predefine-generic more-specific-method?      ((method) (method) classes))
 
 ) )

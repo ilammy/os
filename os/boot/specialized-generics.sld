@@ -1,12 +1,15 @@
 (define-library (os boot specialized-generics)
 
   (import (scheme base)
-          (only (srfi 1) find list-index)
+          (only (srfi 1) first find filter every list-index)
           (srfi 2)  ; and-let*
           (srfi 69) ; hash-tables
+          (only (srfi 95) sort)
           (os accessors)
           (os callables)
+          (os class-of)
           (os instantiation)
+          (os predicates)
           (os primitives)
           (os slot-access)
           (os utils)
@@ -151,5 +154,62 @@
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots callable))))
         (values (lambda (o)   (primitive-ref  (object-of o) index))
                 (lambda (o v) (primitive-set! (object-of o) index v)) ) ) )
+
+
+    ; protocols/generic-calls
+    ;
+    (predefine-method (add-method! generic method) (<generic> <method>)
+      (set-methods! generic (cons method (methods generic)))
+      (set-effective-function! generic (compute-effective-function generic)) )
+
+    (predefine-method (compute-effective-function generic) (<generic>)
+      (lambda args
+        (let* ((discriminators (map class-of (discriminator-args generic args)))
+               (applicable-methods (find-applicable-methods generic discriminators)) )
+          (if (null? applicable-methods)
+              (error "no applicable methods" (name generic) args)
+              (apply (method-body (first applicable-methods)) args) ) ) ) )
+
+    (define (discriminator-args generic args)
+      (let loop ((result '())
+                 (signature (signature generic))
+                 (args args) )
+        (cond ((null? signature) (reverse result))
+              ((pair? (car signature))
+               (loop (cons (car args) result)
+                     (cdr signature)
+                     (cdr args) ) )
+              (else (loop result
+                          (cdr signature)
+                          (cdr args) )) ) ) )
+
+    (predefine-method (find-applicable-methods generic classes) (<generic>)
+      (let ((all-methods    (methods generic))
+            (applicable?    (lambda (method) (method-applicable? method classes)))
+            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
+        (sort (filter applicable? all-methods) more-specific?) ) )
+
+    (define (method-applicable? method classes)
+      (every instance-of? classes (discriminators method)) )
+
+    ; lhs < rhs
+    (predefine-method (more-specific-method? left-m right-m arg-classes)
+                      (<method> <method>)
+      (let loop ((L (discriminators left-m))
+                 (R (discriminators right-m))
+                 (A arg-classes) )
+        (cond ((null? L) #f)
+              ((eq? (car L) (car R))
+               (loop (cdr L)
+                     (cdr R)
+                     (cdr A) ) )
+              ((subclass? (car L)
+                          (car R) ) #t)
+              ((memq (car R)
+                     (memq (car L)
+                           (all-superclasses (car A)) ) ) #t)
+              (else (loop (cdr L)
+                          (cdr R)
+                          (cdr A) )) ) ) )
 
 ) )
