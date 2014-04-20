@@ -1,4 +1,4 @@
-(define-library (os boot class-initializer)
+(define-library (os boot classes initialize)
   ;
   ;   Bootstrapping constructors for classes
   ;
@@ -6,9 +6,9 @@
           (os callables)
           (os primitives)
           (os boot accessors)
-          (os boot class-definitions)
-          (os boot slot-makers)
-          (os boot slot-layout)
+          (os boot classes definitions)
+          (os boot slots make)
+          (os boot slots layout)
           (only (os initargs) for-each-initarg)
           (only (os utils) graph-bfs for-each-with-index) )
 

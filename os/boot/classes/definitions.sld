@@ -1,4 +1,4 @@
-(define-library (os boot class-definitions)
+(define-library (os boot classes definitions)
   ;
   ;   Metaobject definitions
   ;

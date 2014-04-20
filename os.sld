@@ -4,6 +4,7 @@
   ;
   (import (os accessors)
           (os boot initialized-classes)
+          (os boot specialized-generics)
           (os class-of)
           (os generics)
           (os inheritance)
@@ -29,6 +30,8 @@
           getter setter
           signature
           discriminators
-          methods )
+          methods
+
+          test-generic )
 
 )

@@ -1,11 +1,11 @@
-(define-library (os boot slot-layout)
+(define-library (os boot slots layout)
   ;
   ;   Slot layout in predefined metaobjects
   ;
   (import (scheme base)
           (os accessors)
-          (os boot slot-makers)
-          (os boot class-definitions) )
+          (os boot slots make)
+          (os boot classes definitions) )
 
   (export all-slots-of
           direct-<object>-slots

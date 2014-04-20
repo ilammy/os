@@ -17,7 +17,6 @@
         (set-methods! generic '())
         (set-effective-function! generic
           (lambda args (error "no applicable method" (name generic) args)) )
-
         generic ) )
 
     (define-syntax define-generic

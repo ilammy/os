@@ -9,7 +9,7 @@
           (os class-of)
           (os instantiation)
           (os predicates)
-          (os boot class-definitions) )
+          (os boot classes definitions) )
 
   (export add-method! define-method)
 
@@ -47,7 +47,7 @@
         (sort (filter applicable? all-methods) more-specific?) ) )
 
     (define (method-applicable? method classes)
-      (every nonstrict-subclass? classes (discriminators method)) )
+      (every instance-of? classes (discriminators method)) )
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)

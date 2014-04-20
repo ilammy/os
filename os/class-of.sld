@@ -6,7 +6,7 @@
           (os primitives)
           (os callables)
           (os boot accessors)
-          (os boot class-definitions) )
+          (os boot classes definitions) )
 
   (export class-of)
 

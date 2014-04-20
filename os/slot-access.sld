@@ -5,8 +5,8 @@
   (import (scheme base)
           (os class-of)
           (os primitives)
-          (os boot class-definitions)
-          (os boot accessors) )
+          (os boot accessors)
+          (os boot classes definitions) )
 
   (export slot-ref slot-set! slot-bound?)
 

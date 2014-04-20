@@ -1,9 +1,9 @@
 (define-library (os boot initialized-classes)
 
   (import (scheme base)
-          (os boot class-definitions)
-          (os boot class-initializer)
-          (os boot slot-layout) )
+          (os boot classes definitions)
+          (os boot classes initialize)
+          (os boot slots layout) )
 
   (export <object>
           <class>

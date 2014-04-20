@@ -12,7 +12,7 @@
           (os predicates)
           (os primitives)
           (os slot-access)
-          (os boot class-definitions)
+          (os boot classes definitions)
           (only (os utils) graph-bfs for-each-with-index) )
 
   (export make-class)
