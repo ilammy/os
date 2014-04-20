@@ -9,7 +9,8 @@
           (os generics)
           (os inheritance)
           (os instantiation)
-          (os methods) )
+          (os methods)
+          (os slot-access) )
 
   (export <object> <class>
           <slot> <effective-slot>
@@ -32,6 +33,9 @@
           discriminators
           methods
 
-          test-generic )
+          test-generic
+
+          slot-ref
+          slot-set! )
 
 )
