@@ -1,4 +1,4 @@
-(define-library (os boot class-initializer)
+(define-library (os boot classes initialize)
   ;
   ;   Bootstrapping constructors for classes
   ;
@@ -6,9 +6,9 @@
           (os callables)
           (os primitives)
           (os boot accessors)
-          (os boot class-definitions)
-          (os boot slot-makers)
-          (os boot slot-layout)
+          (os boot classes definitions)
+          (os boot slots make)
+          (os boot slots layout)
           (only (os initargs) for-each-initarg)
           (only (os utils) graph-bfs for-each-with-index) )
 
@@ -32,10 +32,10 @@
       (let ((all-slots
               (map (lambda (slot)
                      (make-effective-slot
-                       'name:          (slot-name-ref         slot)
-                       'init-keyword:  (slot-init-keyword-ref slot)
-                       'getter:        (slot-getter-ref       slot)
-                       'setter:        (slot-setter-ref       slot) ) )
+                       'name:          (safe-value (slot-name-ref         slot))
+                       'init-keyword:  (safe-value (slot-init-keyword-ref slot))
+                       'getter:        (safe-value (slot-getter-ref       slot))
+                       'setter:        (safe-value (slot-setter-ref       slot)) ) )
                 (all-slots-of class) ) ))
 
         (let ((make-getter
@@ -46,6 +46,7 @@
                (if (eq? class <generic>)
                    (lambda (index) (lambda (o v) (primitive-set! (object-of o) index v)))
                    (lambda (index) (lambda (o v) (primitive-set! o index v))) ) ) )
+
           (for-each-with-index
             (lambda (index slot)
               (effective-slot-direct-getter-set! slot (make-getter index))
@@ -54,5 +55,8 @@
 
         (class-all-slots-set!     class all-slots)
         (class-instance-size-set! class (length all-slots)) ) )
+
+    (define (safe-value value)
+      (if (undefined-slot-value? value) #f value) )
 
 ) )

@@ -3,20 +3,27 @@
   ;   Generic initialization
   ;
   (import (scheme base)
-          (os accessors)
-          (os instantiation)
-          (os boot initialized-classes) )
+          (os callables)
+          (os boot accessors)
+          (os boot initialized-classes)
+          (os protocols instantiation) )
 
-  (export make-generic)
+  (export define-generic)
 
   (begin
 
-    (define (make-generic . initargs)
-      (let ((generic (apply make <generic> initargs)))
-        (set-methods! generic '())
-        (set-effective-function! generic
-          (lambda args (error "no applicable method" (name generic) args)) )
-
-        generic ) )
+    (define-syntax define-generic
+      (syntax-rules ()
+        ((_ name signature)
+         (define name
+           (let* ((gf-object (make <generic>
+                               (list 'name:             'name
+                                     'signature:        'signature
+                                     'method-combinator: (make <linear-method-combinator> (list)) ) ))
+                  (gf-wrapper (lambda args
+                                (apply (generic-effective-function-ref gf-object)
+                                       args ) )) )
+             (add-callable! gf-wrapper gf-object)
+             gf-wrapper ) ) ) ) )
 
 ) )

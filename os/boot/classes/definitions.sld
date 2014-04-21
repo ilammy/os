@@ -1,4 +1,4 @@
-(define-library (os boot class-definitions)
+(define-library (os boot classes definitions)
   ;
   ;   Metaobject definitions
   ;
@@ -11,7 +11,9 @@
           <effective-slot>
           <generic>
           <method>
-          <procedure> )
+          <procedure>
+          <method-combinator>
+          <linear-method-combinator> )
 
   (begin
 
@@ -25,5 +27,9 @@
 
     ;; Built-in classes
     (define <procedure>      (make-primitive <class> 6))
+
+    ;; Method combinators
+    (define <method-combinator>        (make-primitive <class> 6))
+    (define <linear-method-combinator> (make-primitive <class> 6))
 
 ) )
