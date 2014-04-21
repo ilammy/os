@@ -5,14 +5,14 @@
   (import (scheme base)
           (os boot accessors) )
 
-  (export subclass? instance-of?)
+  (export subclass? nonstrict-subclass?)
 
   (begin
 
     (define (subclass? class superclass)
       (if (memq superclass (class-all-superclasses-ref class)) #t #f) )
 
-    (define (instance-of? class superclass)
+    (define (nonstrict-subclass? class superclass)
       (or (eq? class superclass)
           (subclass? class superclass) ) )
 

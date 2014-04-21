@@ -53,7 +53,7 @@
         (sort (filter applicable? all-methods) more-specific?) ) )
 
     (define (method-applicable? method classes)
-      (every instance-of? classes (discriminators method)) )
+      (every nonstrict-subclass? classes (discriminators method)) )
 
     ; lhs < rhs
     (predefine-method (more-specific-method? $ left-m right-m arg-classes)

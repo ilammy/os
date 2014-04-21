@@ -75,7 +75,7 @@
         (sort (filter applicable? all-methods) more-specific?) ) )
 
     (define (method-applicable? method classes)
-      (every instance-of? classes (method-discriminators-ref method)) )
+      (every nonstrict-subclass? classes (method-discriminators-ref method)) )
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)
