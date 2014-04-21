@@ -2,7 +2,7 @@
   ;
   ;   Slot access metaobject protocol
   ;
-  (import (os boot generics definitions))
+  (import (os boot meta generics))
 
   (export slot-ref-in-class
           slot-set-in-class!

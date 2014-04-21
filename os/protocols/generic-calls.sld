@@ -2,7 +2,7 @@
   ;
   ;   Generic function maintenance metaobject protocol
   ;
-  (import (os boot generics definitions))
+  (import (os boot meta generics))
 
   (export add-method!
             compute-effective-function

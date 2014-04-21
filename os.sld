@@ -2,35 +2,14 @@
   ;
   ;   User layer of OS
   ;
-  (import (os accessors)
-          (os boot initialized-classes)
-          (os boot specialized-generics)
-          (os class-of)
-          (os generics)
-          (os methods)
-          (os slot-access)
+  (import (os boot complete)
+          (os meta classes)
+          (os macros define-generic)
+          (os macros define-method)
           (os protocols instantiation) )
 
-  (export <object> <class>
-          <slot> <effective-slot>
-          <generic> <method>
-          <procedure>
-
-          make
-
+  (export ; define-class
           define-generic
           define-method
 
-          name class-of
-          direct-superclasses all-superclasses
-          direct-slots all-slots
-          init-keyword
-          getter setter
-          signature
-          discriminators
-          methods
-
-          slot-ref
-          slot-set! )
-
-)
+          make <object> ) )

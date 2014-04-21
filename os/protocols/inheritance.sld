@@ -2,7 +2,7 @@
   ;
   ;   Inheritance metaobject protocol (class initialization)
   ;
-  (import (os boot generics definitions))
+  (import (os boot meta generics))
 
   (export compute-all-superclasses
           compute-all-slots

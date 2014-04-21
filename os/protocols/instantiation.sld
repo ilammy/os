@@ -2,7 +2,7 @@
   ;
   ;   Object allocation and instantiation protocol
   ;
-  (import (os boot generics definitions))
+  (import (os boot meta generics))
 
   (export make
             allocate

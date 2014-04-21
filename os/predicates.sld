@@ -3,7 +3,7 @@
   ;   Class relation predicates
   ;
   (import (scheme base)
-          (os accessors) )
+          (os meta accessors) )
 
   (export subclass? nonstrict-subclass?)
 

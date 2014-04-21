@@ -3,10 +3,10 @@
   ;   Class relation predicates
   ;
   (import (scheme base)
-          (os assert)
-          (os class-of)
-          (os boot accessors)
-          (os boot classes definitions) )
+          (os internal class-of)
+          (os boot meta accessors)
+          (os boot meta classes)
+          (os utils assert) )
 
   (export subclass? nonstrict-subclass?)
 
