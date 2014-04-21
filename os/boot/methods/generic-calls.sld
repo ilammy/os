@@ -6,6 +6,7 @@
           (only (srfi 1) filter every)
           (only (srfi 95) sort)
           (os accessors)
+          (os assert)
           (os class-of)
           (os predicates)
           (os boot classes definitions)
@@ -34,6 +35,7 @@
           (effective-method args) ) ) )
 
     (define (discriminator-args generic args)
+      (assert (= (length (signature generic)) (length args)))
       (let loop ((result '())
                  (signature (signature generic))
                  (args args) )
@@ -59,6 +61,9 @@
     ; lhs < rhs
     (predefine-method (more-specific-method? $ left-m right-m arg-classes)
                       (<method> <method>)
+      (assert (= (length (discriminators left-m))
+                 (length (discriminators right-m))
+                 (length arg-classes) ))
       (let loop ((L (discriminators left-m))
                  (R (discriminators right-m))
                  (A arg-classes) )

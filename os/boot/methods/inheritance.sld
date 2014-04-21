@@ -7,6 +7,7 @@
           (srfi 2)  ; and-let*
           (srfi 69) ; hash-tables
           (os accessors)
+          (os assert)
           (os callables)
           (os primitives)
           (os slot-access)
@@ -89,17 +90,32 @@
             (set-direct-setter! slot setter) ) )
         (all-slots class) ) )
 
+    (define-syntax checked-ref
+      (syntax-rules ()
+        ((_ expected-class object index)
+         (begin (assert (primitive? object)
+                        (eq? (primitive-class object) expected-class)
+                        msg: "Invalid object passed to direct accessor" )
+                (primitive-ref object index) ) ) ) )
+
+    (define-syntax checked-set!
+      (syntax-rules ()
+        ((_ expected-class object index value)
+         (begin (assert (primitive? object)
+                        (eq? (primitive-class object) expected-class)
+                        msg: "Invalid object passed to direct accessor" )
+                (primitive-set! object index value) ) ) ) )
+
     (predefine-method (compute-direct-slot-accessors $ class slot)
                       (<class> <effective-slot>)
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots class))))
-        (values (lambda (o)   (primitive-ref  o index))
-                (lambda (o v) (primitive-set! o index v)) ) ) )
+        (values (lambda (o)   (checked-ref  class o index))
+                (lambda (o v) (checked-set! class o index v)) ) ) )
 
     (predefine-method (compute-direct-slot-accessors $ callable slot)
                       (<procedure> <effective-slot>)
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots callable))))
-        (values (lambda (o)   (primitive-ref  (object-of o) index))
-                (lambda (o v) (primitive-set! (object-of o) index v)) ) ) )
-
+        (values (lambda (o)   (checked-ref  callable (object-of o) index))
+                (lambda (o v) (checked-set! callable (object-of o) index v)) ) ) )
 
 ) )
