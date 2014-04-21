@@ -60,6 +60,7 @@
               (effective-method args) ) ) ) ) )
 
     (define (discriminator-args generic args)
+      (assert (= (length (generic-signature-ref generic)) (length args)))
       (let loop ((result '())
                  (signature (generic-signature-ref generic))
                  (args args) )
@@ -83,6 +84,9 @@
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)
+      (assert (= (length (method-discriminators-ref left-method))
+                 (length (method-discriminators-ref right-method))
+                 (length argument-classes) ))
       (let loop ((L (method-discriminators-ref left-method))
                  (R (method-discriminators-ref right-method))
                  (A argument-classes) )
