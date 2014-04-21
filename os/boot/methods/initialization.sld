@@ -1,0 +1,25 @@
+(define-library (os boot methods initialization)
+  ;
+  ;   Other metaobject initialization (part of protocols/instantiation)
+  ;
+  (import (scheme base)
+          (os accessors)
+          (os boot classes definitions)
+          (os boot generics definitions)
+          (os boot methods predefine) )
+
+  (export initialize)
+
+  (begin
+
+    (predefine-method (initialize call-next-method generic initargs) (<generic>)
+      (call-next-method)
+
+      (set-methods! generic '())
+      (set-effective-function! generic
+        (lambda args
+          (error "no applicable method" (name generic) args) ) )
+
+      generic )
+
+) )
