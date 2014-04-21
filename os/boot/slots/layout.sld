@@ -3,7 +3,9 @@
   ;   Slot layout in predefined metaobjects
   ;
   (import (scheme base)
+          (os assert)
           (os accessors)
+          (os boot accessors)
           (os boot slots make)
           (os boot classes definitions) )
 
@@ -122,6 +124,7 @@
             ((eq? class <generic>)                  all-<generic>-slots)
             ((eq? class <method>)                   all-<method>-slots)
             ((eq? class <method-combinator>)        all-<method-combinator>-slots)
-            ((eq? class <linear-method-combinator>) all-<linear-method-combinator>-slots) ) )
+            ((eq? class <linear-method-combinator>) all-<linear-method-combinator>-slots)
+            (else (assert #f msg: (class-name-ref class) "not accounted in all-slots-of")) ) )
 
 ) )

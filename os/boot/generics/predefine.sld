@@ -3,6 +3,7 @@
   ;   Defining predefined generic functions
   ;
   (import (scheme base)
+          (os assert)
           (os callables)
           (os initargs)
           (os primitives)
@@ -22,7 +23,8 @@
         generic ) )
 
     (define (make-default-method-combinator)
-      (make-primitive <linear-method-combinator> <linear-method-combinator>-instance-size) )
+      (make-primitive <linear-method-combinator>
+                      <linear-method-combinator>-instance-size ) )
 
     (define-syntax predefine-generic
       (syntax-rules ()
@@ -47,6 +49,10 @@
             ((method-combinator:) (generic-method-combinator-set! generic value))
             (else (error "unknown init keyword" "<generic>" key)) ) )
         initargs )
+
+      (assert (not (undefined-slot-value? (generic-name-ref              generic)))
+              (not (undefined-slot-value? (generic-signature-ref         generic)))
+              (not (undefined-slot-value? (generic-method-combinator-ref generic))) )
 
       (generic-methods-set! generic '())
       (generic-effective-function-set! generic

@@ -5,6 +5,7 @@
   (import (scheme base)
           (only (srfi 1) first filter every)
           (only (srfi 95) sort)
+          (os assert)
           (os callables)
           (os class-of)
           (os initargs)
@@ -41,12 +42,21 @@
             ((discriminators:) (method-discriminators-set! method value))
             ((method-body:)    (method-body-set!           method value))
             (else (error "unknown init keyword" "<method>" key)) ) )
-        initargs ) )
+        initargs )
+
+      (assert (not (undefined-slot-value? (method-discriminators-ref method)))
+              (not (undefined-slot-value? (method-body-ref method))) ) )
 
     (define (generic-add-method! generic method)
       (let* ((generic (object-of generic))
              (methods (cons method (generic-methods-ref generic))) )
         (generic-methods-set! generic methods)
+
+        (assert (eq? <linear-method-combinator>
+                     (class-of (generic-method-combinator-ref generic)) )
+                msg: "Method combinator"
+                     (class-name-ref (class-of (generic-method-combinator-ref generic)))
+                     "is not expected for predefined generics" )
 
         (generic-effective-function-set! generic
           (lambda args
@@ -56,6 +66,7 @@
               (effective-method args) ) ) ) ) )
 
     (define (discriminator-args generic args)
+      (assert (= (length (generic-signature-ref generic)) (length args)))
       (let loop ((result '())
                  (signature (generic-signature-ref generic))
                  (args args) )
@@ -79,6 +90,9 @@
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)
+      (assert (= (length (method-discriminators-ref left-method))
+                 (length (method-discriminators-ref right-method))
+                 (length argument-classes) ))
       (let loop ((L (method-discriminators-ref left-method))
                  (R (method-discriminators-ref right-method))
                  (A argument-classes) )

@@ -3,7 +3,9 @@
   ;   Utility functions for initargs
   ;
   (import (scheme base)
-          (os primitives) )
+          (os assert)
+          (os primitives)
+          (os boot classes definitions) )
 
   (export (rename primitive-class object-class-ref)
 
@@ -52,20 +54,42 @@
 
   (begin
 
+    (define-syntax check-class
+      (syntax-rules ()
+        ((_ accessor object (class ...))
+         (assert (primitive? object)
+                 (eq? <class> (primitive-class (primitive-class object)))
+                 (or (eq? (primitive-class object) class) ...)
+                 msg: (class-name-ref (primitive-class object))
+                      "is not a valid class for" accessor ) ) ) )
+
+    (define-syntax checked-ref
+      (syntax-rules ()
+        ((_ expected-classes getter object index)
+         (begin (check-class getter object expected-classes)
+                (primitive-ref object index) ) ) ) )
+
+    (define-syntax checked-set!
+      (syntax-rules ()
+        ((_ expected-classes setter object index value)
+         (begin (check-class setter object expected-classes)
+                (primitive-set! object index value) ) ) ) )
+
     (define-syntax define-primitive-accessor-pair
       (syntax-rules ()
-        ((_ i getter setter)
-         (begin (define (getter o)   (primitive-ref  o i))
-                (define (setter o v) (primitive-set! o i v)) ) ) ) )
+        ((_ classes i getter setter)
+         (begin (define (getter o)   (checked-ref  classes getter o i))
+                (define (setter o v) (checked-set! classes setter o i v)) ) ) ) )
 
     (define-syntax define-primitive-accessors
       (syntax-rules ()
-        ((_ (specs ...)) (define-primitive-accessor-pair specs ...))
-        ((_ (specs ...) other-specs ...)
-         (begin (define-primitive-accessor-pair specs ...)
-                (define-primitive-accessors other-specs ...) ) ) ) )
+        ((_ classes (specs ...))
+         (define-primitive-accessor-pair classes specs ...) )
+        ((_ classes (specs ...) other-specs ...)
+         (begin (define-primitive-accessor-pair classes specs ...)
+                (define-primitive-accessors     classes other-specs ...) ) ) ) )
 
-    (define-primitive-accessors
+    (define-primitive-accessors (<class>)
       (0 class-name-ref
          class-name-set! )
       (1 class-direct-superclasses-ref
@@ -79,7 +103,7 @@
       (5 class-instance-size-ref
          class-instance-size-set! ) )
 
-    (define-primitive-accessors
+    (define-primitive-accessors (<slot> <effective-slot>)
       (0 slot-name-ref
          slot-name-set! )
       (1 slot-init-keyword-ref
@@ -89,13 +113,13 @@
       (3 slot-setter-ref
          slot-setter-set! ) )
 
-    (define-primitive-accessors
+    (define-primitive-accessors (<effective-slot>)
       (4 effective-slot-direct-getter-ref
          effective-slot-direct-getter-set! )
       (5 effective-slot-direct-setter-ref
          effective-slot-direct-setter-set! ) )
 
-    (define-primitive-accessors
+    (define-primitive-accessors (<generic>)
       (0 generic-name-ref
          generic-name-set! )
       (1 generic-signature-ref
@@ -107,7 +131,7 @@
       (4 generic-effective-function-ref
          generic-effective-function-set! ) )
 
-    (define-primitive-accessors
+    (define-primitive-accessors (<method>)
       (0 method-discriminators-ref
          method-discriminators-set! )
       (1 method-body-ref
