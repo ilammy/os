@@ -13,12 +13,12 @@
 
     (define-syntax define-method
       (syntax-rules ()
-        ((_ (generic call-next-method args ...) (specializers ...) body1 body2 ...)
+        ((_ (generic call-next-method . args) (specializers ...) body1 body2 ...)
          (add-method! generic
            (make <method>
-             (list 'discriminators: (list specializers ...)
-                   'method-body:
-                     (lambda (call-next-method args ...)
-                       body1 body2 ... ) ) ) ) ) ) )
+             'discriminators: (list specializers ...)
+             'method-body:
+               (lambda (call-next-method . args)
+                 body1 body2 ... ) ) ) ) ) )
 
 ) )
