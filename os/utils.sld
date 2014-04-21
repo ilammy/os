@@ -5,7 +5,7 @@
   (import (scheme base)
           (only (srfi 1) fold) )
 
-  (export for-each-with-index graph-bfs)
+  (export for-each-with-index graph-bfs proper-length)
 
   (begin
 
@@ -37,5 +37,13 @@
 
     (define (reverse-prepend list1 list2)
       (fold cons list2 list1) )
+
+    (define (proper-length list)
+      (let loop ((list   list)
+                 (length 0) )
+        (cond ((null? list)       length)
+              ((not (pair? list)) length)
+              (else (loop (cdr list)
+                          (+ 1 length) )) ) ) )
 
 ) )

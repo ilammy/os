@@ -10,6 +10,7 @@
           (os class-of)
           (os initargs)
           (os primitives)
+          (os utils)
           (os boot accessors)
           (os boot predicates)
           (os boot classes definitions) )
@@ -27,12 +28,12 @@
 
     (define-syntax predefine-method
       (syntax-rules ()
-        ((_ (generic call-next-method args ...) (specializers ...) body1 body2 ...)
+        ((_ (generic call-next-method . args) (specializers ...) body1 body2 ...)
          (generic-add-method! generic
            (make-method
              'discriminators: (list specializers ...)
              'method-body:
-               (lambda (call-next-method args ...)
+               (lambda (call-next-method . args)
                  body1 body2 ... ) ) ) ) ) )
 
     (define (initialize-method! method initargs)
@@ -66,11 +67,13 @@
               (effective-method args) ) ) ) ) )
 
     (define (discriminator-args generic args)
-      (assert (= (length (generic-signature-ref generic)) (length args)))
+      (assert (<= (proper-length (generic-signature-ref generic))
+                  (length args) ))
       (let loop ((result '())
                  (signature (generic-signature-ref generic))
                  (args args) )
-        (cond ((null? signature) (reverse result))
+        (cond ((or (null? signature)
+                   (symbol? signature) ) (reverse result))
               ((pair? (car signature))
                (loop (cons (car args) result)
                      (cdr signature)

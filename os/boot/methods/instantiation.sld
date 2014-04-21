@@ -16,7 +16,7 @@
 
   (begin
 
-    (predefine-method (make $ class initargs) (<class>)
+    (predefine-method (make $ class . initargs) (<class>)
       (initialize (allocate class initargs) initargs) )
 
     (predefine-method (allocate $ class initargs) (<class>)

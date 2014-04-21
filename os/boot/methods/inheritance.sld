@@ -47,10 +47,10 @@
 
     (predefine-method (compute-effective-slot $ class slots) (<class>)
       (make <effective-slot>
-        (list 'name:         (name (car slots))
-              'init-keyword: (first-bound 'init-keyword slots)
-              'getter:       (first-bound 'getter       slots)
-              'setter:       (first-bound 'setter       slots) ) ) )
+        'name:         (name (car slots))
+        'init-keyword: (first-bound 'init-keyword slots)
+        'getter:       (first-bound 'getter       slots)
+        'setter:       (first-bound 'setter       slots) ) )
 
     (define (first-bound slot-name objects)
       (let ((slot-bound? (lambda (object) (slot-bound? object slot-name))))

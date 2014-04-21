@@ -31,7 +31,7 @@
 
     ; protocols/instantiation
     ;
-    (predefine-generic make       ((class) initargs))
+    (predefine-generic make       ((class) . initargs))
     (predefine-generic allocate   ((class) initargs))
     (predefine-generic initialize ((object) initargs))
 
