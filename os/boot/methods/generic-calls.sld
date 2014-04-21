@@ -9,6 +9,7 @@
           (os assert)
           (os class-of)
           (os predicates)
+          (os utils)
           (os boot classes definitions)
           (os boot generics definitions)
           (os boot methods predefine) )
@@ -35,7 +36,8 @@
           (effective-method args) ) ) )
 
     (define (discriminator-args generic args)
-      (assert (= (length (signature generic)) (length args)))
+      (assert (<= (proper-length (signature generic))
+                  (length args) ))
       (let loop ((result '())
                  (signature (signature generic))
                  (args args) )
