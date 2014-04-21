@@ -5,6 +5,7 @@
   (import (scheme base)
           (only (srfi 1) first filter every)
           (only (srfi 95) sort)
+          (os assert)
           (os callables)
           (os class-of)
           (os initargs)
@@ -41,7 +42,10 @@
             ((discriminators:) (method-discriminators-set! method value))
             ((method-body:)    (method-body-set!           method value))
             (else (error "unknown init keyword" "<method>" key)) ) )
-        initargs ) )
+        initargs )
+
+      (assert (not (undefined-slot-value? (method-discriminators-ref method)))
+              (not (undefined-slot-value? (method-body-ref method))) ) )
 
     (define (generic-add-method! generic method)
       (let* ((generic (object-of generic))

@@ -3,6 +3,7 @@
   ;   Bootstrapping constructors for slots
   ;
   (import (scheme base)
+          (os assert)
           (os initargs)
           (os primitives)
           (os boot accessors)
@@ -27,6 +28,10 @@
         effective-slot ) )
 
     (define (initialize-slot! slot initargs)
+      (slot-init-keyword-set! slot #f)
+      (slot-getter-set!       slot #f)
+      (slot-setter-set!       slot #f)
+
       (for-each-initarg
         (lambda (key value)
           (case key
@@ -35,6 +40,8 @@
             ((getter:)       (slot-getter-set!       slot value))
             ((setter:)       (slot-setter-set!       slot value))
             (else (error "unknown init keyword" "<slot>" key)) ) )
-        initargs ) )
+        initargs )
+
+      (assert (not (undefined-slot-value? (slot-name-ref slot)))) )
 
 ) )

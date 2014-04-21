@@ -3,6 +3,7 @@
   ;   Bootstrapping constructors for classes
   ;
   (import (scheme base)
+          (os assert)
           (os callables)
           (os primitives)
           (os boot accessors)
@@ -25,6 +26,10 @@
            ((direct-slots:)        (class-direct-slots-set!        class value))
            (else (error "unknown init keyword" "<class>" key)) ) )
         initargs )
+
+      (assert (not (undefined-slot-value? (class-name-ref                class)))
+              (not (undefined-slot-value? (class-direct-superclasses-ref class)))
+              (not (undefined-slot-value? (class-direct-slots-ref        class))) )
 
       (class-all-superclasses-set! class
         (cdr (graph-bfs class class-direct-superclasses-ref eq?)) )
