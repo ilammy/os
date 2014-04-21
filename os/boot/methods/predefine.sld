@@ -52,6 +52,12 @@
              (methods (cons method (generic-methods-ref generic))) )
         (generic-methods-set! generic methods)
 
+        (assert (eq? <linear-method-combinator>
+                     (class-of (generic-method-combinator-ref generic)) )
+                msg: "Method combinator"
+                     (class-name-ref (class-of (generic-method-combinator-ref generic)))
+                     "is not expected for predefined generics" )
+
         (generic-effective-function-set! generic
           (lambda args
             (let* ((discriminators (map class-of (discriminator-args generic args)))

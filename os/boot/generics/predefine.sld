@@ -23,7 +23,8 @@
         generic ) )
 
     (define (make-default-method-combinator)
-      (make-primitive <linear-method-combinator> <linear-method-combinator>-instance-size) )
+      (make-primitive <linear-method-combinator>
+                      <linear-method-combinator>-instance-size ) )
 
     (define-syntax predefine-generic
       (syntax-rules ()
