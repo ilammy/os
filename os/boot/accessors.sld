@@ -32,7 +32,23 @@
           effective-slot-direct-getter-ref
           effective-slot-direct-getter-set!
           effective-slot-direct-setter-ref
-          effective-slot-direct-setter-set! )
+          effective-slot-direct-setter-set!
+
+          generic-name-ref
+          generic-name-set!
+          generic-signature-ref
+          generic-signature-set!
+          generic-method-combinator-ref
+          generic-method-combinator-set!
+          generic-methods-ref
+          generic-methods-set!
+          generic-effective-function-ref
+          generic-effective-function-set!
+
+          method-discriminators-ref
+          method-discriminators-set!
+          method-body-ref
+          method-body-set! )
 
   (begin
 
@@ -78,5 +94,23 @@
          effective-slot-direct-getter-set! )
       (5 effective-slot-direct-setter-ref
          effective-slot-direct-setter-set! ) )
+
+    (define-primitive-accessors
+      (0 generic-name-ref
+         generic-name-set! )
+      (1 generic-signature-ref
+         generic-signature-set! )
+      (2 generic-method-combinator-ref
+         generic-method-combinator-set! )
+      (3 generic-methods-ref
+         generic-methods-set! )
+      (4 generic-effective-function-ref
+         generic-effective-function-set! ) )
+
+    (define-primitive-accessors
+      (0 method-discriminators-ref
+         method-discriminators-set! )
+      (1 method-body-ref
+         method-body-set! ) )
 
 ) )

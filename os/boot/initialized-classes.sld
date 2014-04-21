@@ -1,9 +1,9 @@
 (define-library (os boot initialized-classes)
 
   (import (scheme base)
-          (os boot class-definitions)
-          (os boot class-initializer)
-          (os boot slot-layout) )
+          (os boot classes definitions)
+          (os boot classes initialize)
+          (os boot slots layout) )
 
   (export <object>
           <class>
@@ -11,7 +11,9 @@
           <effective-slot>
           <procedure>
           <generic>
-          <method> )
+          <method>
+          <method-combinator>
+          <linear-method-combinator> )
 
   (begin
 
@@ -30,5 +32,10 @@
     (init-class! <procedure> (<object>)    direct-<procedure>-slots)
     (init-class! <generic> (<procedure>)   direct-<generic>-slots)
     (init-class! <method> (<object>)       direct-<method>-slots)
+
+    (init-class! <method-combinator> (<object>)
+      direct-<method-combinator>-slots )
+    (init-class! <linear-method-combinator> (<method-combinator>)
+      direct-<linear-method-combinator>-slots )
 
 ) )

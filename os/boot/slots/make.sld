@@ -1,12 +1,12 @@
-(define-library (os boot slot-makers)
+(define-library (os boot slots make)
   ;
   ;   Bootstrapping constructors for slots
   ;
   (import (scheme base)
+          (os initargs)
           (os primitives)
           (os boot accessors)
-          (os boot class-definitions)
-          (only (os initargs) for-each-initarg) )
+          (os boot classes definitions) )
 
   (export make-slot make-effective-slot)
 

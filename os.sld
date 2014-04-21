@@ -4,12 +4,12 @@
   ;
   (import (os accessors)
           (os boot initialized-classes)
-          (os callables)
+          (os boot specialized-generics)
           (os class-of)
           (os generics)
-          (os inheritance)
-          (os instantiation)
-          (os methods) )
+          (os methods)
+          (os slot-access)
+          (os protocols instantiation) )
 
   (export <object> <class>
           <slot> <effective-slot>
@@ -17,10 +17,9 @@
           <procedure>
 
           make
-          make-class
-          make-generic
 
-          add-method!
+          define-generic
+          define-method
 
           name class-of
           direct-superclasses all-superclasses
@@ -31,8 +30,7 @@
           discriminators
           methods
 
-          ; Y U NO MACRO?
-          add-callable!
-          effective-function )
+          slot-ref
+          slot-set! )
 
 )
