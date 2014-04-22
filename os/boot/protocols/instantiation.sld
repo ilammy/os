@@ -3,10 +3,10 @@
   ;   Implementation of protocols/instantiation
   ;
   (import (scheme base)
-          (srfi 2) ; and-let*
           (os meta accessors)
           (os internal class-of)
           (os internal primitives)
+          (os internal slot-access)
           (os boot meta classes)
           (os boot meta generics)
           (os boot macros predefine-method)
@@ -32,10 +32,28 @@
       object )
 
     (define (init-slot-with-initargs! slot object initargs)
-      (and-let* ((keyword (init-keyword slot)))
+      (define (init-with-keyword keyword)
         (let-values (((keyword-found? value) (get-initarg keyword initargs)))
-          (when keyword-found?
-            (let ((slot-set! (direct-setter slot)))
-              (slot-set! object value) ) ) ) ) )
+          (if keyword-found?
+              (values #t value)
+              (init-with-default-value) ) ) )
+
+      (define (init-with-default-value)
+        (if (slot-bound? slot 'init-value)
+            (values #t (init-value slot))
+            (if (slot-bound? slot 'init-thunk)
+                (values #t ((init-thunk slot)))
+                (values #f #f) ) ) )
+
+      (define (compute-init-value)
+        (let ((keyword (init-keyword slot)))
+          (if keyword
+              (init-with-keyword keyword)
+              (init-with-default-value) ) ) )
+
+      (let-values (((should-init? value) (compute-init-value)))
+        (when should-init?
+          (let ((slot-set! (direct-setter slot)))
+            (slot-set! object value) ) ) ) )
 
 ) )

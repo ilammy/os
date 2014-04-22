@@ -4,7 +4,6 @@
   ;
   (import (scheme base)
           (only (srfi 1) find list-index)
-          (srfi 2)  ; and-let*
           (srfi 69) ; hash-tables
           (os meta accessors)
           (os internal callables)
@@ -14,6 +13,7 @@
           (os boot meta generics)
           (os boot macros predefine-method)
           (os utils assert)
+          (os utils initargs)
           (os utils misc) )
 
   (export initialize
@@ -46,16 +46,32 @@
         (group-slots-by-name class) ) )
 
     (predefine-method (compute-effective-slot $ class slots) (<class>)
-      (make <effective-slot>
-        'name:         (name (car slots))
-        'init-keyword: (first-bound 'init-keyword slots)
-        'getter:       (first-bound 'getter       slots)
-        'setter:       (first-bound 'setter       slots) ) )
+      (apply make <effective-slot>
+        (construct-first-bound-initargs slots
+          'name:         'name
+          'init-keyword: 'init-keyword
+          'init-value:   'init-value
+          'init-thunk:   'init-thunk
+          'getter:       'getter
+          'setter:       'setter ) ) )
 
-    (define (first-bound slot-name objects)
+    (define (construct-first-bound-initargs slots . initarg-template)
+      (let ((result '()))
+        (for-each-initarg
+          (lambda (key slot-name)
+            (let-values (((found? value) (find-bound slot-name slots)))
+              (when found?
+                (set! result (cons value (cons key result))) ) ) )
+          initarg-template )
+
+        (reverse result) ) )
+
+    (define (find-bound slot-name objects)
       (let ((slot-bound? (lambda (object) (slot-bound? object slot-name))))
-        (and-let* ((object (find slot-bound? objects)))
-          (slot-ref object slot-name) ) ) )
+        (let ((object (find slot-bound? objects)))
+          (if object
+              (values #t (slot-ref object slot-name))
+              (values #f #f) ) ) ) )
 
     (define (group-slots-by-name class)
       (let ((hash (make-hash-table eq?)))

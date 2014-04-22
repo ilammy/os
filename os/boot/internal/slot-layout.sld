@@ -4,6 +4,7 @@
   ;
   (import (scheme base)
           (os meta accessors)
+          (os protocols instantiation)
           (os boot meta accessors)
           (os boot meta classes)
           (os boot internal make-slots)
@@ -28,6 +29,7 @@
       (list
         (make-slot 'name:         'name
                    'init-keyword: 'name:
+                   'init-value:   '<anonymous>
                    'getter:        name )
 
         (make-slot 'name:         'direct-superclasses
@@ -54,14 +56,25 @@
 
         (make-slot 'name:         'init-keyword
                    'init-keyword: 'init-keyword:
+                   'init-value:    #f
                    'getter:        init-keyword )
+
+        (make-slot 'name:         'init-value
+                   'init-keyword: 'init-value:
+                   'getter:        init-value )
+
+        (make-slot 'name:         'init-thunk
+                   'init-keyword: 'init-thunk:
+                   'getter:        init-thunk )
 
         (make-slot 'name:         'getter
                    'init-keyword: 'getter:
+                   'init-value:    #f
                    'getter:        getter )
 
         (make-slot 'name:         'setter
                    'init-keyword: 'setter:
+                   'init-value:    #f
                    'getter:        setter ) ) )
 
     (define direct-<effective-slot>-slots
@@ -73,6 +86,7 @@
       (list
         (make-slot 'name:         'name
                    'init-keyword: 'name:
+                   'init-value:   '|#<anonymous>|
                    'getter:        name )
 
         (make-slot 'name:         'signature
@@ -81,9 +95,11 @@
 
         (make-slot 'name:         'method-combinator
                    'init-keyword: 'method-combinator:
+                   'init-thunk:    (lambda () (make <linear-method-combinator>))
                    'getter:        method-combinator )
 
         (make-slot 'name:         'methods
+                   'init-value:   '()
                    'getter:        methods )
 
         (make-slot 'name:         'effective-function) ) )

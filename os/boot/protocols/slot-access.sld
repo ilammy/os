@@ -40,6 +40,8 @@
       (case slot-name
         ((name)             (slot-name-ref                    eslot))
         ((init-keyword)     (slot-init-keyword-ref            eslot))
+        ((init-value)       (slot-init-value-ref              eslot))
+        ((init-thunk)       (slot-init-thunk-ref              eslot))
         ((getter)           (slot-getter-ref                  eslot))
         ((setter)           (slot-setter-ref                  eslot))
         ((direct-getter)    (effective-slot-direct-getter-ref eslot))

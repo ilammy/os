@@ -20,6 +20,20 @@
 
     (define (initialize-class! class . initargs)
       (assert (eq? <class> (class-of class)))
+
+      (initialize-slots-with-initargs! class initargs)
+
+      (class-all-superclasses-set! class
+        (cdr (graph-bfs class class-direct-superclasses-ref eq?)) )
+
+      (let ((all-slots (install-direct-slot-accessors! class
+                        (compute-all-class-slots class) )))
+        (class-all-slots-set! class all-slots)
+        (class-instance-size-set! class (length all-slots)) )
+
+      class )
+
+    (define (initialize-slots-with-initargs! class initargs)
       (for-each-initarg
         (lambda (key value)
           (case key
@@ -29,41 +43,51 @@
            (else (error "unknown init keyword" "<class>" key)) ) )
         initargs )
 
-      (assert (not (undefined-slot-value? (class-name-ref                class)))
-              (not (undefined-slot-value? (class-direct-superclasses-ref class)))
+      (assert (not (undefined-slot-value? (class-direct-superclasses-ref class)))
               (not (undefined-slot-value? (class-direct-slots-ref        class))) )
 
-      (class-all-superclasses-set! class
-        (cdr (graph-bfs class class-direct-superclasses-ref eq?)) )
+      (when (undefined-slot-value? (class-name-ref class))
+        (class-name-set! class '<anonymous>) ) )
 
-      (let ((all-slots
-              (map (lambda (slot)
-                     (make-effective-slot
-                       'name:          (safe-value (slot-name-ref         slot))
-                       'init-keyword:  (safe-value (slot-init-keyword-ref slot))
-                       'getter:        (safe-value (slot-getter-ref       slot))
-                       'setter:        (safe-value (slot-setter-ref       slot)) ) )
-                (all-slots-of class) ) ))
+    (define (compute-all-class-slots class)
+      (map (lambda (slot)
+             (apply make-effective-slot
+               (with-defined-initargs
+                 'name:          (slot-name-ref         slot)
+                 'init-keyword:  (slot-init-keyword-ref slot)
+                 'init-value:    (slot-init-value-ref   slot)
+                 'init-thunk:    (slot-init-thunk-ref   slot)
+                 'getter:        (slot-getter-ref       slot)
+                 'setter:        (slot-setter-ref       slot) ) ) )
+        (all-slots-of class) ) )
 
-        (let ((make-getter
-               (if (eq? class <generic>)
-                   (lambda (index) (lambda (o) (primitive-ref (object-of o) index)))
-                   (lambda (index) (lambda (o) (primitive-ref o index))) ) )
-              (make-setter
-               (if (eq? class <generic>)
-                   (lambda (index) (lambda (o v) (primitive-set! (object-of o) index v)))
-                   (lambda (index) (lambda (o v) (primitive-set! o index v))) ) ) )
+    (define (install-direct-slot-accessors! class all-slots)
+      (define (make-getter index)
+        (if (eq? class <generic>)
+            (lambda (o) (primitive-ref (object-of o) index))
+            (lambda (o) (primitive-ref o index)) ) )
 
-          (for-each-with-index
-            (lambda (index slot)
-              (effective-slot-direct-getter-set! slot (make-getter index))
-              (effective-slot-direct-setter-set! slot (make-setter index)) )
-            all-slots ) )
+      (define (make-setter index)
+        (if (eq? class <generic>)
+            (lambda (o v) (primitive-set! (object-of o) index v))
+            (lambda (o v) (primitive-set! o index v)) ) )
 
-        (class-all-slots-set!     class all-slots)
-        (class-instance-size-set! class (length all-slots)) ) )
+      (for-each-with-index
+        (lambda (index slot)
+          (effective-slot-direct-getter-set! slot (make-getter index))
+          (effective-slot-direct-setter-set! slot (make-setter index)) )
+        all-slots )
 
-    (define (safe-value value)
-      (if (undefined-slot-value? value) #f value) )
+      all-slots )
+
+    (define (with-defined-initargs . initargs)
+      (let ((result '()))
+        (for-each-initarg
+          (lambda (key value)
+            (unless (undefined-slot-value? value)
+              (set! result (cons value (cons key result))) ) )
+          initargs )
+
+        (reverse result) ) )
 
 ) )

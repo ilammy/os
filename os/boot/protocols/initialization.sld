@@ -15,7 +15,6 @@
     (predefine-method (initialize call-next-method generic initargs) (<generic>)
       (call-next-method)
 
-      (set-methods! generic '())
       (set-effective-function! generic
         (lambda args
           (error "no applicable method" (name generic) args) ) )

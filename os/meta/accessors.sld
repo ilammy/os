@@ -9,6 +9,8 @@
           direct-superclasses
           direct-slots
           init-keyword
+          init-value
+          init-thunk
           getter
           setter
           signature
@@ -37,6 +39,8 @@
     (def-ref-set direct-superclasses direct-superclasses)
     (def-ref-set direct-slots        direct-slots)
     (def-ref-set init-keyword        init-keyword)
+    (def-ref-set init-value          init-value)
+    (def-ref-set init-thunk          init-thunk)
     (def-ref-set getter              getter)
     (def-ref-set setter              setter)
     (def-ref-set signature           signature)

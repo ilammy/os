@@ -13,8 +13,8 @@
 
   (begin
 
-    (define <slot>-instance-size           4)
-    (define <effective-slot>-instance-size 6)
+    (define <slot>-instance-size           6)
+    (define <effective-slot>-instance-size 8)
 
     (define (make-slot . initargs)
       (let ((slot (make-primitive <slot> <slot>-instance-size)))
@@ -28,23 +28,27 @@
         effective-slot ) )
 
     (define (initialize-slot! slot initargs)
-      (slot-init-keyword-set! slot #f)
-      (slot-getter-set!       slot #f)
-      (slot-setter-set!       slot #f)
-
       (for-each-initarg
         (lambda (key value)
           (case key
             ((name:)         (slot-name-set!         slot value))
             ((init-keyword:) (slot-init-keyword-set! slot value))
+            ((init-value:)   (slot-init-value-set!   slot value))
+            ((init-thunk:)   (slot-init-thunk-set!   slot value))
             ((getter:)       (slot-getter-set!       slot value))
             ((setter:)       (slot-setter-set!       slot value))
             (else (error "unknown init keyword" "<slot>" key)) ) )
         initargs )
 
-      (assert (not (undefined-slot-value? (slot-name-ref         slot)))
-              (not (undefined-slot-value? (slot-init-keyword-ref slot)))
-              (not (undefined-slot-value? (slot-getter-ref       slot)))
-              (not (undefined-slot-value? (slot-setter-ref       slot))) ) )
+      (assert (not (undefined-slot-value? (slot-name-ref slot))))
+
+      (when (undefined-slot-value? (slot-init-keyword-ref slot))
+        (slot-init-keyword-set! slot #f) )
+
+      (when (undefined-slot-value? (slot-getter-ref slot))
+        (slot-getter-set! slot #f) )
+
+      (when (undefined-slot-value? (slot-setter-ref slot))
+        (slot-setter-set! slot #f) ) )
 
 ) )
