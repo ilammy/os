@@ -34,10 +34,12 @@
 
         (make-slot 'name:         'direct-superclasses
                    'init-keyword: 'direct-superclasses:
+                   'init-required: #t
                    'getter:        direct-superclasses )
 
         (make-slot 'name:         'direct-slots
                    'init-keyword: 'direct-slots:
+                   'init-required: #t
                    'getter:        direct-slots )
 
         (make-slot 'name:         'all-superclasses
@@ -52,12 +54,18 @@
       (list
         (make-slot 'name:         'name
                    'init-keyword: 'name:
+                   'init-required: #t
                    'getter:        name )
 
         (make-slot 'name:         'init-keyword
                    'init-keyword: 'init-keyword:
                    'init-value:    #f
                    'getter:        init-keyword )
+
+        (make-slot 'name:         'init-required
+                   'init-keyword: 'init-required:
+                   'init-value:    #f
+                   'getter:        init-required? )
 
         (make-slot 'name:         'init-value
                    'init-keyword: 'init-value:
@@ -91,6 +99,7 @@
 
         (make-slot 'name:         'signature
                    'init-keyword: 'signature:
+                   'init-required: #t
                    'getter:        signature )
 
         (make-slot 'name:         'method-combinator
@@ -108,10 +117,12 @@
       (list
         (make-slot 'name:         'discriminators
                    'init-keyword: 'discriminators:
+                   'init-required: #t
                    'getter:        discriminators )
 
         (make-slot 'name:         'method-body
-                   'init-keyword: 'method-body: ) ) )
+                   'init-keyword: 'method-body:
+                   'init-required: #t ) ) )
 
     (define direct-<procedure>-slots '())
 

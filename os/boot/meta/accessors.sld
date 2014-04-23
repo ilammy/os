@@ -26,6 +26,8 @@
           slot-name-set!
           slot-init-keyword-ref
           slot-init-keyword-set!
+          slot-init-required-ref
+          slot-init-required-set!
           slot-init-value-ref
           slot-init-value-set!
           slot-init-thunk-ref
@@ -112,19 +114,21 @@
          slot-name-set! )
       (1 slot-init-keyword-ref
          slot-init-keyword-set! )
-      (2 slot-init-value-ref
+      (2 slot-init-required-ref
+         slot-init-required-set! )
+      (3 slot-init-value-ref
          slot-init-value-set! )
-      (3 slot-init-thunk-ref
+      (4 slot-init-thunk-ref
          slot-init-thunk-set! )
-      (4 slot-getter-ref
+      (5 slot-getter-ref
          slot-getter-set! )
-      (5 slot-setter-ref
+      (6 slot-setter-ref
          slot-setter-set! ) )
 
     (define-primitive-accessors (<effective-slot>)
-      (6 effective-slot-direct-getter-ref
+      (7 effective-slot-direct-getter-ref
          effective-slot-direct-getter-set! )
-      (7 effective-slot-direct-setter-ref
+      (8 effective-slot-direct-setter-ref
          effective-slot-direct-setter-set! ) )
 
     (define-primitive-accessors (<generic>)

@@ -48,12 +48,13 @@
     (predefine-method (compute-effective-slot $ class slots) (<class>)
       (apply make <effective-slot>
         (construct-first-bound-initargs slots
-          'name:         'name
-          'init-keyword: 'init-keyword
-          'init-value:   'init-value
-          'init-thunk:   'init-thunk
-          'getter:       'getter
-          'setter:       'setter ) ) )
+          'name:          'name
+          'init-keyword:  'init-keyword
+          'init-required: 'init-required
+          'init-value:    'init-value
+          'init-thunk:    'init-thunk
+          'getter:        'getter
+          'setter:        'setter ) ) )
 
     (define (construct-first-bound-initargs slots . initarg-template)
       (let ((result '()))

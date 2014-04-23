@@ -44,7 +44,8 @@
         initargs )
 
       (assert (not (undefined-slot-value? (class-direct-superclasses-ref class)))
-              (not (undefined-slot-value? (class-direct-slots-ref        class))) )
+              (not (undefined-slot-value? (class-direct-slots-ref        class)))
+              msg: "Required slots of a <class> are not initialized" )
 
       (when (undefined-slot-value? (class-name-ref class))
         (class-name-set! class '<anonymous>) ) )
@@ -53,12 +54,13 @@
       (map (lambda (slot)
              (apply make-effective-slot
                (with-defined-initargs
-                 'name:          (slot-name-ref         slot)
-                 'init-keyword:  (slot-init-keyword-ref slot)
-                 'init-value:    (slot-init-value-ref   slot)
-                 'init-thunk:    (slot-init-thunk-ref   slot)
-                 'getter:        (slot-getter-ref       slot)
-                 'setter:        (slot-setter-ref       slot) ) ) )
+                 'name:          (slot-name-ref          slot)
+                 'init-keyword:  (slot-init-keyword-ref  slot)
+                 'init-required: (slot-init-required-ref slot)
+                 'init-value:    (slot-init-value-ref    slot)
+                 'init-thunk:    (slot-init-thunk-ref    slot)
+                 'getter:        (slot-getter-ref        slot)
+                 'setter:        (slot-setter-ref        slot) ) ) )
         (all-slots-of class) ) )
 
     (define (install-direct-slot-accessors! class all-slots)

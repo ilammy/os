@@ -30,6 +30,7 @@
         initargs )
 
       (assert (not (undefined-slot-value? (method-discriminators-ref method)))
-              (not (undefined-slot-value? (method-body-ref method))) ) )
+              (not (undefined-slot-value? (method-body-ref method)))
+              msg: "Required slots of a <method> are not initialized" ) )
 
 ) )

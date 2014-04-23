@@ -23,6 +23,9 @@
           direct-superclasses
           direct-slots
           init-keyword
+          init-value
+          init-thunk
+          init-required?
           getter
           setter
           signature

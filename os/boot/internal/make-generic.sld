@@ -34,7 +34,8 @@
             (else (error "unknown init keyword" "<generic>" key)) ) )
         initargs )
 
-      (assert (not (undefined-slot-value? (generic-signature-ref generic))))
+      (assert (not (undefined-slot-value? (generic-signature-ref generic)))
+              msg: "Required slots of a <generic> are not initialized" )
 
       (when (undefined-slot-value? (generic-name-ref generic))
         (generic-name-set! generic '|#<anonymous>|) )

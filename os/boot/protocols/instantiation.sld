@@ -51,9 +51,12 @@
               (init-with-keyword keyword)
               (init-with-default-value) ) ) )
 
-      (let-values (((should-init? value) (compute-init-value)))
-        (when should-init?
-          (let ((slot-set! (direct-setter slot)))
-            (slot-set! object value) ) ) ) )
+      (let-values (((can-init? value) (compute-init-value)))
+        (if can-init?
+            (let ((slot-set! (direct-setter slot)))
+              (slot-set! object value) )
+            (when (init-required? slot)
+              (error "no init value provided for a required slot"
+                     (name (class-of object)) (name slot) ) ) ) ) )
 
 ) )
