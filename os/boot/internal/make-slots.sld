@@ -7,7 +7,8 @@
           (os boot meta accessors)
           (os boot meta classes)
           (os utils assert)
-          (os utils initargs) )
+          (os utils initargs)
+          (os utils misc) )
 
   (export make-slot make-effective-slot)
 
@@ -38,11 +39,8 @@
             ((init-thunk:)    (slot-init-thunk-set!    slot value))
             ((getter:)        (slot-getter-set!        slot value))
             ((setter:)        (slot-setter-set!        slot value))
-            (else (error "unknown init keyword" "<slot>" key)) ) )
+            (else (assert #f msg: "Unknown init keyword used for <slot>:" key)) ) )
         initargs )
-
-      (assert (not (undefined-slot-value? (slot-name-ref slot)))
-              msg: "Required slots of a <slot> are not initialized" )
 
       (when (undefined-slot-value? (slot-init-keyword-ref slot))
         (slot-init-keyword-set! slot #f) )
@@ -54,6 +52,26 @@
         (slot-getter-set! slot #f) )
 
       (when (undefined-slot-value? (slot-setter-ref slot))
-        (slot-setter-set! slot #f) ) )
+        (slot-setter-set! slot #f) )
+
+      (assert (not (undefined-slot-value? (slot-name-ref slot)))
+              msg: "Required slots of a <slot> are not initialized" )
+
+      (let ((has-init-value (not (undefined-slot-value? (slot-init-value-ref slot))))
+            (has-init-thunk (not (undefined-slot-value? (slot-init-thunk-ref slot))))
+            (init-required  (slot-init-required-ref slot))
+            (init-keyword   (slot-init-keyword-ref slot)) )
+
+        (assert (not (and has-init-value has-init-thunk))
+                msg: "A slot cannot have both init-value and init-thunk defined" )
+
+        (assert (implies has-init-thunk (procedure? (slot-init-thunk-ref slot)))
+                msg: "Init thunk must be a procedure" )
+
+        (assert (implies init-required init-keyword)
+                msg: "A slot cannot be required without having a keyword" )
+
+        (assert (implies init-required (not (or has-init-value has-init-thunk)))
+                msg: "A slot cannot be required while having a default value" ) ) )
 
 ) )

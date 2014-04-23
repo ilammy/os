@@ -26,7 +26,7 @@
           (case key
             ((discriminators:) (method-discriminators-set! method value))
             ((method-body:)    (method-body-set!           method value))
-            (else (error "unknown init keyword" "<method>" key)) ) )
+            (else (assert #f msg: "Unknown init keyword used for <method>:" key)) ) )
         initargs )
 
       (assert (not (undefined-slot-value? (method-discriminators-ref method)))

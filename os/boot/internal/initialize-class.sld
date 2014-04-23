@@ -40,7 +40,7 @@
            ((name:)                (class-name-set!                class value))
            ((direct-superclasses:) (class-direct-superclasses-set! class value))
            ((direct-slots:)        (class-direct-slots-set!        class value))
-           (else (error "unknown init keyword" "<class>" key)) ) )
+           (else (assert #f msg: "Unknown init keyword used for <class>:" key)) ) )
         initargs )
 
       (assert (not (undefined-slot-value? (class-direct-superclasses-ref class)))

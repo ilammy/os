@@ -31,7 +31,7 @@
           (case key
             ((name:)              (generic-name-set!      generic value))
             ((signature:)         (generic-signature-set! generic value))
-            (else (error "unknown init keyword" "<generic>" key)) ) )
+            (else (assert #f msg: "Unknown init keyword used for <generic>:" key)) ) )
         initargs )
 
       (assert (not (undefined-slot-value? (generic-signature-ref generic)))
