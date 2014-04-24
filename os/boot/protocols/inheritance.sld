@@ -3,9 +3,9 @@
   ;   Implementation of protocols/inheritance
   ;
   (import (scheme base)
-          (only (srfi 1) find list-index)
-          (srfi 2)  ; and-let*
+          (only (srfi 1) find list-index every)
           (srfi 69) ; hash-tables
+          (os predicates)
           (os meta accessors)
           (os internal callables)
           (os internal primitives)
@@ -14,6 +14,7 @@
           (os boot meta generics)
           (os boot macros predefine-method)
           (os utils assert)
+          (os utils initargs)
           (os utils misc) )
 
   (export initialize
@@ -46,16 +47,36 @@
         (group-slots-by-name class) ) )
 
     (predefine-method (compute-effective-slot $ class slots) (<class>)
-      (make <effective-slot>
-        'name:         (name (car slots))
-        'init-keyword: (first-bound 'init-keyword slots)
-        'getter:       (first-bound 'getter       slots)
-        'setter:       (first-bound 'setter       slots) ) )
+      (assert (not (null? slots)))
+      (assert (every (lambda (o) (instance-of? <slot> o)) slots))
+      (apply make <effective-slot>
+        (append (list 'name: (name (car slots)))
+                (first-specified-in slots 'init-keyword: 'init-keyword)
+                (first-specified-in slots 'setter:       'setter)
+                (first-specified-in slots 'getter:       'getter)
+                (initialization-spec slots) ) ) )
 
-    (define (first-bound slot-name objects)
-      (let ((slot-bound? (lambda (object) (slot-bound? object slot-name))))
-        (and-let* ((object (find slot-bound? objects)))
-          (slot-ref object slot-name) ) ) )
+    ;; init-keyword, getter, and setter slots share the default value: it is #f.
+    ;; We are interested in the first explicitly given value in these slots.
+    (define (first-specified-in objects init-keyword slot-name)
+      (let loop ((objects objects))
+        (if (null? objects) '()
+            (let ((object (car objects)))
+              (assert (slot-bound? object slot-name))
+              (let ((value (slot-ref object slot-name)))
+                (if value (list init-keyword value)
+                          (loop (cdr objects)) ) ) ) ) ) )
+
+    ;; Slot is default-initialized with either a value or a thunk, whichever
+    ;; is defined in the latest (first-met) slot specification. However, an
+    ;; explicit initialization demand has top priority.
+    (define (initialization-spec slots)
+      (let loop ((slots slots))
+        (cond ((null? slots) '())
+              ((init-required? (car slots))          '(init-required: #t))
+              ((slot-bound? (car slots) 'init-value) (list 'init-value: (init-value (car slots))))
+              ((slot-bound? (car slots) 'init-thunk) (list 'init-thunk: (init-thunk (car slots))))
+              (else (loop (cdr slots))) ) ) )
 
     (define (group-slots-by-name class)
       (let ((hash (make-hash-table eq?)))

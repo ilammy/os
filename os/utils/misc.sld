@@ -5,7 +5,10 @@
   (import (scheme base)
           (only (srfi 1) fold) )
 
-  (export for-each-with-index graph-bfs proper-length)
+  (export for-each-with-index
+          graph-bfs
+          proper-length
+          implies )
 
   (begin
 
@@ -45,5 +48,7 @@
               ((not (pair? list)) length)
               (else (loop (cdr list)
                           (+ 1 length) )) ) ) )
+
+    (define (implies premise consequence) (or (not premise) consequence))
 
 ) )

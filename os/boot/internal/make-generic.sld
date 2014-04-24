@@ -31,14 +31,20 @@
           (case key
             ((name:)              (generic-name-set!      generic value))
             ((signature:)         (generic-signature-set! generic value))
-            (else (error "unknown init keyword" "<generic>" key)) ) )
+            (else (assert #f msg: "Unknown init keyword used for <generic>:" key)) ) )
         initargs )
 
-      (assert (not (undefined-slot-value? (generic-name-ref      generic)))
-              (not (undefined-slot-value? (generic-signature-ref generic))) )
+      (assert (not (undefined-slot-value? (generic-signature-ref generic)))
+              msg: "Required slots of a <generic> are not initialized" )
 
-      (generic-method-combinator-set! generic (make-default-method-combinator))
+      (when (undefined-slot-value? (generic-name-ref generic))
+        (generic-name-set! generic '|#<anonymous>|) )
+
+      (when (undefined-slot-value? (generic-method-combinator-ref generic))
+        (generic-method-combinator-set! generic (make-default-method-combinator)) )
+
       (generic-methods-set! generic '())
+
       (generic-effective-function-set! generic
         (lambda args
           (error "no applicable method" (generic-name-ref generic) args) ) ) )
