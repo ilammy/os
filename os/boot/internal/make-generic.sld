@@ -7,13 +7,14 @@
           (os boot meta accessors)
           (os boot meta classes)
           (os utils assert)
-          (os utils initargs) )
+          (os utils initargs)
+          (os utils misc) )
 
   (export make-generic)
 
   (begin
 
-    (define <generic>-instance-size                  5)
+    (define <generic>-instance-size                  6)
     (define <linear-method-combinator>-instance-size 0)
 
     (define (make-default-method-combinator)
@@ -47,6 +48,12 @@
 
       (generic-effective-function-set! generic
         (lambda args
-          (error "no applicable method" (generic-name-ref generic) args) ) ) )
+          (error "no applicable method" (generic-name-ref generic) args) ) )
+
+      (generic-significant-positions-set! generic
+        (calculate-significant-positions (generic-signature-ref generic)) ) )
+
+    (define (calculate-significant-positions signature)
+      (indices-of pair? signature ) )
 
 ) )

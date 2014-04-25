@@ -52,11 +52,15 @@
           generic-methods-set!
           generic-effective-function-ref
           generic-effective-function-set!
+          generic-significant-positions-ref
+          generic-significant-positions-set!
 
-          method-discriminators-ref
-          method-discriminators-set!
+          method-signature-ref
+          method-signature-set!
           method-body-ref
-          method-body-set! )
+          method-body-set!
+          method-discriminators-ref
+          method-discriminators-set! )
 
   (begin
 
@@ -141,12 +145,16 @@
       (3 generic-methods-ref
          generic-methods-set! )
       (4 generic-effective-function-ref
-         generic-effective-function-set! ) )
+         generic-effective-function-set! )
+      (5 generic-significant-positions-ref
+         generic-significant-positions-set! ) )
 
     (define-primitive-accessors (<method>)
-      (0 method-discriminators-ref
-         method-discriminators-set! )
+      (0 method-signature-ref
+         method-signature-set! )
       (1 method-body-ref
-         method-body-set! ) )
+         method-body-set! )
+      (2 method-discriminators-ref
+         method-discriminators-set! ) )
 
 ) )

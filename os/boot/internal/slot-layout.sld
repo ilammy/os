@@ -111,18 +111,22 @@
                    'init-value:   '()
                    'getter:        methods )
 
-        (make-slot 'name:         'effective-function) ) )
+        (make-slot 'name:         'effective-function)
+
+        (make-slot 'name:         'significant-positions) ) )
 
     (define direct-<method>-slots
       (list
-        (make-slot 'name:         'discriminators
-                   'init-keyword: 'discriminators:
+        (make-slot 'name:         'signature
+                   'init-keyword: 'signature:
                    'init-required: #t
-                   'getter:        discriminators )
+                   'getter:        signature )
 
         (make-slot 'name:         'method-body
                    'init-keyword: 'method-body:
-                   'init-required: #t ) ) )
+                   'init-required: #t )
+
+        (make-slot 'name:         'discriminators) ) )
 
     (define direct-<procedure>-slots '())
 

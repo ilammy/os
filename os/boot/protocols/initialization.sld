@@ -3,6 +3,7 @@
   ;   Other metaobject initialization (part of protocols/instantiation)
   ;
   (import (scheme base)
+          (only (srfi 1) filter-map)
           (os meta accessors)
           (os internal slot-access)
           (os boot meta classes)
@@ -14,16 +15,35 @@
 
   (begin
 
-    (predefine-method (initialize call-next-method generic initargs) (<generic>)
+    (predefine-method (initialize call-next-method generic initargs) `((generic ,<generic>) initargs)
       (call-next-method)
 
       (set-effective-function! generic
         (lambda args
           (error "no applicable method" (name generic) args) ) )
 
+      (set-significant-positions! generic
+        (compute-significant-positions (signature generic)) )
+
       generic )
 
-    (predefine-method (initialize call-next-method eslot initargs) (<effective-slot>)
+    (predefine-method (initialize call-next-method method initargs) `((method ,<method>) initargs)
+      (call-next-method)
+
+      (set-discriminators! method
+        (filter-discriminators (signature method)) )
+
+      method )
+
+    (define (compute-significant-positions signature)
+      (indices-of pair? signature ) )
+
+    (define (filter-discriminators signature)
+      (filter-map
+        (lambda (spec) (if (pair? spec) (cadr spec) #f))
+        signature ) )
+
+    (predefine-method (initialize call-next-method eslot initargs) `((eslot ,<effective-slot>) initargs)
       (call-next-method)
 
       (let ((has-init-value (slot-bound? eslot 'init-value))

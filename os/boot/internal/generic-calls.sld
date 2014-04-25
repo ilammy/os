@@ -33,35 +33,31 @@
 
         (generic-effective-function-set! generic
           (lambda args
-            (let* ((discriminators (map class-of (discriminator-args generic args)))
-                   (applicable-methods (applicable-methods generic discriminators))
+            (let* ((arg-classes (map class-of (significant-args generic args)))
+                   (applicable-methods (applicable-methods generic arg-classes))
                    (effective-method (effective-method applicable-methods)) )
               (effective-method args) ) ) ) ) )
 
-    (define (discriminator-args generic args)
-      (assert (<= (proper-length (generic-signature-ref generic))
-                  (length args) ))
-      (let loop ((result '())
-                 (signature (generic-signature-ref generic))
-                 (args args) )
-        (cond ((or (null? signature)
-                   (symbol? signature) ) (reverse result))
-              ((pair? (car signature))
-               (loop (cons (car args) result)
-                     (cdr signature)
-                     (cdr args) ) )
-              (else (loop result
-                          (cdr signature)
-                          (cdr args) )) ) ) )
+    (define (significant-args generic args)
+      (assert (every (lambda (position) (< position (length args)))
+                     (generic-significant-positions-ref generic) )
+              msg: "Signatures do not agree.\n"
+                   "Signature:" (generic-signature-ref args) "\n"
+                   "Significants:" (generic-significant-positions-ref args) "\n"
+                   "Args:" args )
+      (map (lambda (index) (list-ref args index))
+        (generic-significant-positions-ref generic) ) )
 
-    (define (applicable-methods generic classes)
+    (define (applicable-methods generic arg-classes)
       (let ((all-methods    (generic-methods-ref generic))
-            (applicable?    (lambda (method) (method-applicable? method classes)))
-            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
+            (applicable?    (lambda (method) (method-applicable? method arg-classes)))
+            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs arg-classes))) )
         (sort (filter applicable? all-methods) more-specific?) ) )
 
-    (define (method-applicable? method classes)
-      (every nonstrict-subclass? classes (method-discriminators-ref method)) )
+    (define (method-applicable? method arg-classes)
+      (every nonstrict-subclass?
+        arg-classes
+        (method-discriminators-ref method) ) )
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)

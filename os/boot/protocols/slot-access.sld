@@ -17,7 +17,7 @@
   (begin
 
     (predefine-method (slot-ref-in-class $ object class slot-name)
-                      (<object> <class>)
+                      `((object ,<object>) (class ,<class>) slot-name)
       (let ((value (cond
                      ((eq? class <class>)          (slot-ref-in-<class> object slot-name))
                      ((eq? class <effective-slot>) (slot-ref-in-<eslot> object slot-name))
@@ -55,13 +55,13 @@
         (slot-ref object) ) )
 
     (predefine-method (slot-set-in-class! $ object class slot-name value)
-                      (<object> <class>)
+                      `((object ,<object>) (class ,<class>) slot-name value)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-set! (direct-setter slot)) )
         (slot-set! object value) ) )
 
     (predefine-method (slot-bound-in-class? $ object class slot-name)
-                      (<object> <class>)
+                      `((object ,<object>) (class ,<class>) slot-name)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-ref (direct-getter slot)) )
         (if (undefined-slot-value? (slot-ref object)) #f #t) ) )

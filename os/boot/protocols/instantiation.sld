@@ -18,13 +18,13 @@
 
   (begin
 
-    (predefine-method (make $ class . initargs) (<class>)
+    (predefine-method (make $ class . initargs) `((class ,<class>) . initargs)
       (initialize (allocate class initargs) initargs) )
 
-    (predefine-method (allocate $ class initargs) (<class>)
+    (predefine-method (allocate $ class initargs) `((class ,<class>) initargs)
       (make-primitive class (instance-size class)) )
 
-    (predefine-method (initialize $ object initargs) (<object>)
+    (predefine-method (initialize $ object initargs) `((object ,<object>) initargs)
       (for-each
         (lambda (slot)
           (init-slot-with-initargs! slot object initargs) )

@@ -23,46 +23,40 @@
 
   (begin
 
-    (predefine-method (add-method! $ generic method) (<generic> <method>)
+    (predefine-method (add-method! $ generic method) `((generic ,<generic>) (method ,<method>))
       (set-methods! generic (cons method (methods generic)))
       (set-effective-function! generic (compute-effective-function generic)) )
 
-    (predefine-method (compute-effective-function $ generic) (<generic>)
+    (predefine-method (compute-effective-function $ generic) `((generic ,<generic>))
       (lambda args
-        (let* ((discriminators (map class-of (discriminator-args generic args)))
-               (applicable-methods (find-applicable-methods generic discriminators))
+        (let* ((arg-classes (map class-of (significant-args generic args)))
+               (applicable-methods (find-applicable-methods generic arg-classes))
                (combinator (method-combinator generic))
                (effective-method (compute-effective-method combinator applicable-methods)) )
           (effective-method args) ) ) )
 
-    (define (discriminator-args generic args)
-      (assert (<= (proper-length (signature generic))
-                  (length args) ))
-      (let loop ((result '())
-                 (signature (signature generic))
-                 (args args) )
-        (cond ((or (null? signature)
-                   (symbol? signature) ) (reverse result))
-              ((pair? (car signature))
-               (loop (cons (car args) result)
-                     (cdr signature)
-                     (cdr args) ) )
-              (else (loop result
-                          (cdr signature)
-                          (cdr args) )) ) ) )
+    (define (significant-args generic args)
+      (assert (every (lambda (position) (< position (length args)))
+                     (significant-positions generic) )
+              msg: "Signatures do not agree.\n"
+                   "Signature:" (signature args) "\n"
+                   "Significants:" (significant-positions args) "\n"
+                   "Args:" args )
+      (map (lambda (index) (list-ref args index))
+        (significant-positions generic) ) )
 
-    (predefine-method (find-applicable-methods $ generic classes) (<generic>)
+    (predefine-method (find-applicable-methods $ generic arg-classes) `((generic ,<generic>) arg-classes)
       (let ((all-methods    (methods generic))
-            (applicable?    (lambda (method) (method-applicable? method classes)))
-            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
+            (applicable?    (lambda (method) (method-applicable? method arg-classes)))
+            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs arg-classes))) )
         (sort (filter applicable? all-methods) more-specific?) ) )
 
-    (define (method-applicable? method classes)
-      (every nonstrict-subclass? classes (discriminators method)) )
+    (define (method-applicable? method arg-classes)
+      (every nonstrict-subclass? arg-classes (discriminators method)) )
 
     ; lhs < rhs
     (predefine-method (more-specific-method? $ left-m right-m arg-classes)
-                      (<method> <method>)
+                      `((left-m ,<method>) (right-m ,<method>) arg-classes)
       (assert (= (length (discriminators left-m))
                  (length (discriminators right-m))
                  (length arg-classes) ))
@@ -84,13 +78,13 @@
                           (cdr A) )) ) ) )
 
     (predefine-method (compute-effective-method $ combinator methods)
-                      (<linear-method-combinator>)
+                      `((combinator ,<linear-method-combinator>) methods)
       (if (null? methods) (error "no applicable methods")
           (let ((methods (map compute-method-function methods)))
             (lambda (args)
               ((car methods) (cdr methods) args) ) ) ) )
 
-    (predefine-method (compute-method-function $ method) (<method>)
+    (predefine-method (compute-method-function $ method) `((method ,<method>))
       (let ((method-body (method-body method)))
         (lambda (next-methods args)
           (apply method-body

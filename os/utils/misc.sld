@@ -6,6 +6,7 @@
           (only (srfi 1) fold) )
 
   (export for-each-with-index
+          indices-of
           graph-bfs
           proper-length
           implies )
@@ -18,6 +19,15 @@
         (unless (null? list)
           (proc index (car list))
           (loop (+ 1 index) (cdr list)) ) ) )
+
+    (define (indices-of pred? list)
+      (let loop ((result '())
+                 (list list)
+                 (index 0) )
+        (cond ((not (pair? list)) (reverse result))
+              ((pred? (car list))
+               (loop (cons index result) (cdr list) (+ 1 index)))
+              (else (loop result (cdr list) (+ 1 index))) ) ) )
 
     (define (graph-bfs root-node adjacent-nodes node-equal?)
       (let loop ((visited-nodes (list root-node))
