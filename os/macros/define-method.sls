@@ -5,7 +5,7 @@
   ;
   (export define-method)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os meta classes)
           (os protocols generic-calls)
           (os protocols instantiation) )

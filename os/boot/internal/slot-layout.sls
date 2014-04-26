@@ -14,7 +14,7 @@
           direct-<method-combinator>-slots
           direct-<linear-method-combinator>-slots )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os meta accessors)
           (os protocols instantiation)
           (os boot meta accessors)
@@ -95,7 +95,7 @@
       (list
         (make-slot 'name:         'name
                    'init-keyword: 'name:
-                   'init-value:   '|#<anonymous>|
+                   'init-value:   (string->symbol "#<anonymous>")
                    'getter:        name )
 
         (make-slot 'name:         'signature

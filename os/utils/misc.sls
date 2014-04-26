@@ -8,8 +8,9 @@
           proper-length
           implies )
 
-  (import (rnrs base)
-          (only (srfi :1) fold) )
+  (import (except (rnrs base) assert)
+          (rnrs control)
+          (only (srfi :1) fold member) )
 
   (begin
 

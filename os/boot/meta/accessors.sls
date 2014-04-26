@@ -3,7 +3,7 @@
   ;
   ;   Utility functions for initargs
   ;
-  (export (rename primitive-class object-class-ref)
+  (export (rename (primitive-class object-class-ref))
 
           class-name-ref
           class-name-set!
@@ -54,7 +54,7 @@
           method-body-ref
           method-body-set! )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os boot meta classes)
           (os internal primitives)
           (os utils assert) )

@@ -5,7 +5,8 @@
   ;
   (export make-generic)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)
@@ -39,7 +40,7 @@
               msg: "Required slots of a <generic> are not initialized" )
 
       (when (undefined-slot-value? (generic-name-ref generic))
-        (generic-name-set! generic '|#<anonymous>|) )
+        (generic-name-set! generic (string->symbol "#<anonymous>")) )
 
       (when (undefined-slot-value? (generic-method-combinator-ref generic))
         (generic-method-combinator-set! generic (make-default-method-combinator)) )
@@ -48,6 +49,6 @@
 
       (generic-effective-function-set! generic
         (lambda args
-          (error "no applicable method" (generic-name-ref generic) args) ) ) )
+          (error #f "no applicable method" (generic-name-ref generic) args) ) ) )
 
 ) )

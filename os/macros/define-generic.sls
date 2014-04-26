@@ -5,7 +5,7 @@
   ;
   (export define-generic)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os meta classes)
           (os protocols instantiation)
           (os internal callables)

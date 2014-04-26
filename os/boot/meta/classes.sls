@@ -13,7 +13,7 @@
           <method-combinator>
           <linear-method-combinator> )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os internal primitives) )
 
   (begin

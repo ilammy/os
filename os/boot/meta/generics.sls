@@ -25,7 +25,7 @@
             compute-effective-method
               compute-method-function )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os boot macros predefine-generic) )
 
   (begin

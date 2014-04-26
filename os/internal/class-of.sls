@@ -5,7 +5,7 @@
   ;
   (export class-of)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os meta classes)
           (os internal callables)
           (os internal primitives)
@@ -17,6 +17,6 @@
       (cond ((primitive? object) (object-class-ref object))
             ((callable?  object) (object-class-ref (object-of object)))
             ((procedure? object) <procedure>)
-            (else (error "unsupported object type" object)) ) )
+            (else (error #f "unsupported object type" object)) ) )
 
 ) )

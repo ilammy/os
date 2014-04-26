@@ -11,7 +11,8 @@
             finalize-slot-descriptors!
               compute-direct-slot-accessors )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (compatibility mlist)
           (only (srfi :1) find list-index every)
           (srfi :69) ; hash-tables
           (os predicates)
@@ -85,7 +86,7 @@
           (lambda (direct-slot)
             (let ((slot-name (name direct-slot)))
               (if (hash-table-exists? hash slot-name)
-                  (error "duplicate direct slot" (name class) slot-name)
+                  (error #f "duplicate direct slot" (name class) slot-name)
                   (hash-table-set! hash slot-name (list direct-slot)) ) ) )
           (direct-slots class) )
 
@@ -99,7 +100,7 @@
               (direct-slots superclass) ) )
           (all-superclasses class) )
 
-        (map reverse (hash-table-values hash)) ) )
+        (map reverse (list->mlist (hash-table-values hash))) ) )
 
     (predefine-method (compute-instance-size $ class) (<class>)
       (length (all-slots class)) )
@@ -140,4 +141,5 @@
         (values (lambda (o)   (checked-ref  callable (object-of o) index))
                 (lambda (o v) (checked-set! callable (object-of o) index v)) ) ) )
 
+    'dummy
 ) )

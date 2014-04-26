@@ -11,7 +11,7 @@
           <method-combinator>
           <linear-method-combinator> )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os boot meta classes)
           (os boot internal initialize-class)
           (os boot internal slot-layout) )

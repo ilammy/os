@@ -10,9 +10,10 @@
               compute-effective-method
                 compute-method-function )
 
-  (import (rnrs base)
-          (only (srfi :1) filter every)
-          (only (srfi :95) sort)
+  (import (except (rnrs base) assert)
+          (rnrs lists)
+          (only (srfi :1) every)
+          (only (rnrs sorting) list-sort)
           (os predicates)
           (os meta accessors)
           (os internal class-of)
@@ -56,7 +57,7 @@
       (let ((all-methods    (methods generic))
             (applicable?    (lambda (method) (method-applicable? method classes)))
             (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
-        (sort (filter applicable? all-methods) more-specific?) ) )
+        (list-sort more-specific? (filter applicable? all-methods)) ) )
 
     (define (method-applicable? method classes)
       (every nonstrict-subclass? classes (discriminators method)) )
@@ -86,7 +87,7 @@
 
     (predefine-method (compute-effective-method $ combinator methods)
                       (<linear-method-combinator>)
-      (if (null? methods) (error "no applicable methods")
+      (if (null? methods) (error #f "no applicable methods")
           (let ((methods (map compute-method-function methods)))
             (lambda (args)
               ((car methods) (cdr methods) args) ) ) ) )
@@ -98,5 +99,7 @@
            (if (null? next-methods) #f
                (lambda () ((car next-methods) (cdr next-methods) args)) )
            args ) ) ) )
+
+  'dummy
 
 ) )

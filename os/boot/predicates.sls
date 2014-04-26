@@ -5,7 +5,8 @@
   ;
   (export subclass? nonstrict-subclass?)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs lists)
           (os internal class-of)
           (os boot meta accessors)
           (os boot meta classes)

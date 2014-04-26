@@ -3,7 +3,7 @@
 
   (export predefine-method)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os boot internal generic-calls)
           (os boot internal make-method) )
 

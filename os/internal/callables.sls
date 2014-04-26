@@ -5,7 +5,7 @@
   ;
   (export callable? object-of add-callable!)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (srfi :69) ) ; hash-tables
 
   (begin

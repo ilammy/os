@@ -7,7 +7,8 @@
           subclass?
           nonstrict-subclass? )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs lists)
           (os meta accessors)
           (os internal class-of) )
 

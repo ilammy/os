@@ -5,7 +5,7 @@
   ;
   (export make-method)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)

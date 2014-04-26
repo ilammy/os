@@ -5,7 +5,8 @@
   ;
   (export initialize)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (os meta accessors)
           (os internal slot-access)
           (os boot meta classes)
@@ -20,7 +21,7 @@
 
       (set-effective-function! generic
         (lambda args
-          (error "no applicable method" (name generic) args) ) )
+          (error #f "no applicable method" (name generic) args) ) )
 
       generic )
 
@@ -33,17 +34,17 @@
             (init-keyword   (init-keyword eslot)) )
 
         (when (and has-init-value has-init-thunk)
-          (error "slot has both init-value and init-thunk defined" (name eslot) initargs) )
+          (error #f "slot has both init-value and init-thunk defined" (name eslot) initargs) )
 
         (when has-init-thunk
           (unless (procedure? (init-thunk eslot))
-            (error "init-thunk is not a procedure" (name eslot) initargs) ) )
+            (error #f "init-thunk is not a procedure" (name eslot) initargs) ) )
 
         (unless (implies init-required init-keyword)
-          (error "slot is init-required but has no init-keyword" (name eslot) initargs) )
+          (error #f "slot is init-required but has no init-keyword" (name eslot) initargs) )
 
         (when (and init-required (or has-init-value has-init-thunk))
-          (error "slot is init-required while having init-value" (name eslot) initargs) ) )
+          (error #f "slot is init-required while having init-value" (name eslot) initargs) ) )
 
       eslot )
 

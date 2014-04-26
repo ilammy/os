@@ -7,7 +7,7 @@
           slot-set-in-class!
           slot-bound-in-class? )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os meta accessors)
           (os internal primitives)
           (os boot meta accessors)
@@ -24,7 +24,7 @@
                      ((eq? class <effective-slot>) (slot-ref-in-<eslot> object slot-name))
                      (else (slot-ref-in-<object> object class slot-name)) ) ))
         (if (undefined-slot-value? value)
-            (error "uninitialized slot" object (name class) slot-name)
+            (error #f "uninitialized slot" object (name class) slot-name)
             value ) ) )
 
     (define (slot-ref-in-<class> class slot-name)
@@ -35,7 +35,7 @@
         ((all-superclasses)    (class-all-superclasses-ref    class))
         ((all-slots)           (class-all-slots-ref           class))
         ((instance-size)       (class-instance-size-ref       class))
-        (else (error "unknown slot" "<class>" slot-name)) ) )
+        (else (error #f "unknown slot" "<class>" slot-name)) ) )
 
     (define (slot-ref-in-<eslot> eslot slot-name)
       (case slot-name
@@ -48,7 +48,7 @@
         ((setter)           (slot-setter-ref                  eslot))
         ((direct-getter)    (effective-slot-direct-getter-ref eslot))
         ((direct-setter)    (effective-slot-direct-setter-ref eslot))
-        (else (error "unknown slot" "<effective-slot>" slot-name)) ) )
+        (else (error #f "unknown slot" "<effective-slot>" slot-name)) ) )
 
     (define (slot-ref-in-<object> object class slot-name)
       (let* ((slot (find-slot-by-name class slot-name))
@@ -69,8 +69,9 @@
 
     (define (find-slot-by-name class slot-name)
       (let scan ((slots (all-slots class)))
-        (cond ((null? slots) (error "unknown slot" (name class) slot-name))
+        (cond ((null? slots) (error #f "unknown slot" (name class) slot-name))
               ((eq? slot-name (name (car slots))) (car slots))
               (else (scan (cdr slots))) ) ) )
 
+    'dummy
 ) )

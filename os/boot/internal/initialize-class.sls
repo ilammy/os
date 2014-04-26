@@ -5,7 +5,8 @@
   ;
   (export initialize-class!)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (os internal callables)
           (os internal class-of)
           (os internal primitives)

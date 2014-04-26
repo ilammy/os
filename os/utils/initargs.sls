@@ -6,7 +6,8 @@
   (export for-each-initarg
           get-initarg )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (only (srfi :1) first second drop) )
 
   (begin

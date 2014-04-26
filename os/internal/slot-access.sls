@@ -5,7 +5,7 @@
   ;
   (export slot-ref slot-set! slot-bound?)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os internal class-of)
           (os protocols slot-access) )
 

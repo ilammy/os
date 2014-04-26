@@ -25,7 +25,7 @@
   ; ;
    ;          Failure messages are printed into this port.
   ; ;
-   ;      Features:
+   ;      Features: (not working in R6RS)
   ; ;
    ;        - assertions-nonfatal
   ; ;
@@ -39,7 +39,7 @@
   ; ;
   (export assert)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (rnrs io simple) )
 
   (begin
@@ -73,22 +73,17 @@
 
     (define-syntax raise-assertion-error
       (syntax-rules ()
-        ((_)
-         (cond-expand
-           (assertions-nonfatal (begin))
-           (else (error "failed assertion")) ) ) ) )
+        ((_) (error #f "failed assertion")) ) )
 
     (define-syntax report-failure
       (syntax-rules ()
         ((_ failing-test messages)
-         (cond-expand
-           (assertions-disabled (begin))
-           (else (begin (print-failure-message failing-test messages)
-                        (raise-assertion-error) )) ) ) ) )
+         (begin (print-failure-message failing-test messages)
+                (raise-assertion-error) ) ) ) )
 
     (define-syntax do-assertion
       (syntax-rules ()
-        ((_ () messages) (begin))
+        ((_ () messages) (begin #f))
         ((_ (test1 test2 ...) messages)
          (if test1 (do-assertion (test2 ...) messages)
                    (report-failure test1 messages) ) ) ) )

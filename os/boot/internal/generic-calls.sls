@@ -5,9 +5,10 @@
   ;
   (export generic-add-method!)
 
-  (import (rnrs base)
-          (only (srfi :1) first filter every)
-          (only (srfi :95) sort)
+  (import (except (rnrs base) assert)
+          (rnrs lists)
+          (only (srfi :1) first every)
+          (only (rnrs sorting) list-sort)
           (os internal callables)
           (os internal class-of)
           (os boot meta accessors)
@@ -59,7 +60,7 @@
       (let ((all-methods    (generic-methods-ref generic))
             (applicable?    (lambda (method) (method-applicable? method classes)))
             (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
-        (sort (filter applicable? all-methods) more-specific?) ) )
+        (list-sort more-specific? (filter applicable? all-methods)) ) )
 
     (define (method-applicable? method classes)
       (every nonstrict-subclass? classes (method-discriminators-ref method)) )
@@ -88,7 +89,7 @@
 
     ; always linear combinator
     (define (effective-method methods)
-      (if (null? methods) (error "no applicable methods")
+      (if (null? methods) (error #f "no applicable methods")
           (let ((methods (map method-function methods)))
             (lambda (args)
               ((car methods) (cdr methods) args) ) ) ) )

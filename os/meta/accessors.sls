@@ -24,7 +24,7 @@
           methods            set-methods!
           effective-function set-effective-function! )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os internal slot-access) )
 
   (begin

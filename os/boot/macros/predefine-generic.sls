@@ -3,7 +3,7 @@
 
   (export predefine-generic)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
           (os internal callables)
           (os boot internal make-generic)
           (os boot meta accessors) )

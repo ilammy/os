@@ -7,7 +7,8 @@
             allocate
             initialize )
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (os meta accessors)
           (os internal class-of)
           (os internal primitives)
@@ -57,7 +58,8 @@
             (let ((slot-set! (direct-setter slot)))
               (slot-set! object value) )
             (when (init-required? slot)
-              (error "no init value provided for a required slot"
+              (error #f "no init value provided for a required slot"
                      (name (class-of object)) (name slot) ) ) ) ) )
 
+    'dummy
 ) )

@@ -11,21 +11,23 @@
           primitive-set!
           undefined-slot-value? )
 
-  (import (rnrs base))
+  (import (except (rnrs base) assert)
+          (rnrs records syntactic) )
 
   (begin
- 
-    (define-record-type undefined-value
-      (make-undefined-value)
-      undefined-slot-value? )
+
+    (define-record-type (undefined-value
+                         make-undefined-value
+                         undefined-slot-value?) )
 
     (define *undefined-slot-value* (make-undefined-value))
 
-    (define-record-type primitive-object
-      (make-primitive-object class slots)
-      primitive?
-      (class primitive-class set-primitive-class!)
-      (slots primitive-slots) )
+    (define-record-type (primitive-object
+                         make-primitive-object
+                         primitive?)
+      (fields
+        (mutable   class primitive-class set-primitive-class!)
+        (immutable slots primitive-slots) ) )
 
     (define (make-primitive class slot-count)
       (make-primitive-object class

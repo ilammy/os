@@ -5,7 +5,8 @@
   ;
   (export make-slot make-effective-slot)
 
-  (import (rnrs base)
+  (import (except (rnrs base) assert)
+          (rnrs control)
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)
