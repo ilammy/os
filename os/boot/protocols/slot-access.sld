@@ -16,12 +16,12 @@
 
   (begin
 
-    (predefine-method (slot-ref-in-class $ object class slot-name)
-                      `((object ,<object>) (class ,<class>) slot-name)
+    (predefine-method (slot-ref-in-class $ class object slot-name)
+                      `((class ,<class>) object slot-name)
       (let ((value (cond
                      ((eq? class <class>)          (slot-ref-in-<class> object slot-name))
                      ((eq? class <effective-slot>) (slot-ref-in-<eslot> object slot-name))
-                     (else (slot-ref-in-<object> object class slot-name)) ) ))
+                     (else (slot-ref-in-<object> class object slot-name)) ) ))
         (if (undefined-slot-value? value)
             (error "uninitialized slot" object (name class) slot-name)
             value ) ) )
@@ -49,19 +49,19 @@
         ((direct-setter)    (effective-slot-direct-setter-ref eslot))
         (else (error "unknown slot" "<effective-slot>" slot-name)) ) )
 
-    (define (slot-ref-in-<object> object class slot-name)
+    (define (slot-ref-in-<object> class object slot-name)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-ref (direct-getter slot)) )
         (slot-ref object) ) )
 
-    (predefine-method (slot-set-in-class! $ object class slot-name value)
-                      `((object ,<object>) (class ,<class>) slot-name value)
+    (predefine-method (slot-set-in-class! $ class object slot-name value)
+                      `((class ,<class>) object slot-name value)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-set! (direct-setter slot)) )
         (slot-set! object value) ) )
 
-    (predefine-method (slot-bound-in-class? $ object class slot-name)
-                      `((object ,<object>) (class ,<class>) slot-name)
+    (predefine-method (slot-bound-in-class? $ class object slot-name)
+                      `((class ,<class>) object slot-name)
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-ref (direct-getter slot)) )
         (if (undefined-slot-value? (slot-ref object)) #f #t) ) )

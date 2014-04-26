@@ -11,12 +11,12 @@
   (begin
 
     (define (slot-ref object slot-name)
-      (slot-ref-in-class object (class-of object) slot-name) )
+      (slot-ref-in-class (class-of object) object slot-name) )
 
     (define (slot-set! object slot-name value)
-      (slot-set-in-class! object (class-of object) slot-name value) )
+      (slot-set-in-class! (class-of object) object slot-name value) )
 
     (define (slot-bound? object slot-name)
-      (slot-bound-in-class? object (class-of object) slot-name) )
+      (slot-bound-in-class? (class-of object) object slot-name) )
 
 ) )

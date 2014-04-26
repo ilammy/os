@@ -37,9 +37,9 @@
 
     ; protocols/slot-access
     ;
-    (predefine-generic slot-ref-in-class    ((object) (class) slot-name))
-    (predefine-generic slot-set-in-class!   ((object) (class) slot-name value))
-    (predefine-generic slot-bound-in-class? ((object) (class) slot-name))
+    (predefine-generic slot-ref-in-class    ((class) object slot-name))
+    (predefine-generic slot-set-in-class!   ((class) object slot-name value))
+    (predefine-generic slot-bound-in-class? ((class) object slot-name))
 
     ; protocols/inheritance
     ;
