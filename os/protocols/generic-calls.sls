@@ -1,0 +1,13 @@
+#!r6rs
+(library (os protocols generic-calls)
+  ;
+  ;   Generic function maintenance metaobject protocol
+  ;
+  (export add-method!
+            compute-effective-function
+              find-applicable-methods
+                more-specific-method?
+              compute-effective-method
+                compute-method-function )
+
+  (import (os boot meta generics)) )
