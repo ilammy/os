@@ -3,7 +3,8 @@
   ;
   ;   Defining predefined methods
   ;
-  (export generic-add-method!)
+  (export generic-add-method!
+          compute-<method>-function )
 
   (import (except (rnrs base) assert)
           (rnrs lists)
@@ -86,11 +87,12 @@
     ; always linear combinator
     (define (effective-method methods)
       (if (null? methods) (error #f "no applicable methods")
-          (let ((methods (map method-function methods)))
+          (let ((methods (map compute-<method>-function methods)))
             (lambda (args)
               ((car methods) (cdr methods) args) ) ) ) )
 
-    (define (method-function method)
+    (define (compute-<method>-function method)
+      (assert (eq? <method> (class-of method)))
       (let ((method-body (method-body-ref method)))
         (lambda (next-methods args)
           (apply method-body
