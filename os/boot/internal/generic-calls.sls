@@ -9,11 +9,11 @@
           (rnrs lists)
           (only (srfi :1) first every)
           (only (rnrs sorting) list-sort)
+          (os predicates)
           (os internal callables)
           (os internal class-of)
           (os boot meta accessors)
           (os boot meta classes)
-          (os boot predicates)
           (os utils assert)
           (os utils misc) )
 
