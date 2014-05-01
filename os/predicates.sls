@@ -15,7 +15,7 @@
   (begin
 
     (define (instance-of? class object)
-      (nonstrict-subclass? class (class-of object)) )
+      (nonstrict-subclass? (class-of object) class) )
 
     (define (subclass? class superclass)
       (if (memq superclass (all-superclasses class)) #t #f) )

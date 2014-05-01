@@ -14,10 +14,10 @@
 
     (define-syntax define-method
       (syntax-rules ()
-        ((_ (generic call-next-method . args) (specializers ...) body1 body2 ...)
+        ((_ (generic call-next-method . args) signature body1 body2 ...)
          (add-method! generic
            (make <method>
-             'discriminators: (list specializers ...)
+             'signature: signature
              'method-body:
                (lambda (call-next-method . args)
                  body1 body2 ... ) ) ) ) ) )

@@ -23,10 +23,14 @@
               find-applicable-methods
                 more-specific-method?
               compute-effective-method
-                compute-method-function )
+                compute-method-function
+
+          to-write
+          to-display )
 
   (import (os boot complete)
           (os protocols generic-calls)
           (os protocols inheritance)
           (os protocols instantiation)
-          (os protocols slot-access) ) )
+          (os protocols slot-access)
+          (os protocols pretty-printing) ) )

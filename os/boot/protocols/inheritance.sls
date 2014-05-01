@@ -29,7 +29,7 @@
 
   (begin
 
-    (predefine-method (initialize call-next-method class initargs) (<class>)
+    (predefine-method (initialize call-next-method class initargs) `((class ,<class>) initargs)
       (call-next-method)
 
       (set-all-superclasses! class (compute-all-superclasses class))
@@ -39,16 +39,16 @@
 
       class )
 
-    (predefine-method (compute-all-superclasses $ class) (<class>)
+    (predefine-method (compute-all-superclasses $ class) `((class ,<class>))
       ; exclude the class itself from the precendence list
       (cdr (graph-bfs class direct-superclasses eq?)) )
 
-    (predefine-method (compute-all-slots $ class) (<class>)
+    (predefine-method (compute-all-slots $ class) `((class ,<class>))
       (map (lambda (slots)
              (compute-effective-slot class slots) )
         (group-slots-by-name class) ) )
 
-    (predefine-method (compute-effective-slot $ class slots) (<class>)
+    (predefine-method (compute-effective-slot $ class slots) `((class ,<class>) slots)
       (assert (not (null? slots)))
       (assert (every (lambda (o) (instance-of? <slot> o)) slots))
       (apply make <effective-slot>
@@ -102,10 +102,10 @@
 
         (map reverse (list->mlist (hash-table-values hash))) ) )
 
-    (predefine-method (compute-instance-size $ class) (<class>)
+    (predefine-method (compute-instance-size $ class) `((class ,<class>))
       (length (all-slots class)) )
 
-    (predefine-method (finalize-slot-descriptors! $ class) (<class>)
+    (predefine-method (finalize-slot-descriptors! $ class) `((class ,<class>))
       (for-each
         (lambda (slot)
           (let-values (((getter setter) (compute-direct-slot-accessors class slot)))
@@ -130,13 +130,13 @@
                 (primitive-set! object index value) ) ) ) )
 
     (predefine-method (compute-direct-slot-accessors $ class slot)
-                      (<class> <effective-slot>)
+                      `((class ,<class>) (slot ,<effective-slot>))
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots class))))
         (values (lambda (o)   (checked-ref  class o index))
                 (lambda (o v) (checked-set! class o index v)) ) ) )
 
     (predefine-method (compute-direct-slot-accessors $ callable slot)
-                      (<procedure> <effective-slot>)
+                      `((callable ,<procedure>) (slot ,<effective-slot>))
       (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots callable))))
         (values (lambda (o)   (checked-ref  callable (object-of o) index))
                 (lambda (o v) (checked-set! callable (object-of o) index v)) ) ) )

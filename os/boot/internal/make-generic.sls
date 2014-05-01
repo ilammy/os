@@ -10,12 +10,14 @@
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)
+          (os boot internal signature-checks)
           (os utils assert)
-          (os utils initargs) )
+          (os utils initargs)
+          (os utils misc) )
 
   (begin
 
-    (define <generic>-instance-size                  5)
+    (define <generic>-instance-size                  6)
     (define <linear-method-combinator>-instance-size 0)
 
     (define (make-default-method-combinator)
@@ -39,6 +41,8 @@
       (assert (not (undefined-slot-value? (generic-signature-ref generic)))
               msg: "Required slots of a <generic> are not initialized" )
 
+      (assert (valid-signature? (generic-signature-ref generic)))
+
       (when (undefined-slot-value? (generic-name-ref generic))
         (generic-name-set! generic (string->symbol "#<anonymous>")) )
 
@@ -49,6 +53,12 @@
 
       (generic-effective-function-set! generic
         (lambda args
-          (error #f "no applicable method" (generic-name-ref generic) args) ) ) )
+          (error #f "no applicable method" (generic-name-ref generic) args) ) )
+
+      (generic-significant-positions-set! generic
+        (calculate-significant-positions (generic-signature-ref generic)) ) )
+
+    (define (calculate-significant-positions signature)
+      (indices-of list? signature ) )
 
 ) )

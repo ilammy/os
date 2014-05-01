@@ -6,4 +6,5 @@
   (export)
 
   (import (os boot strap classes)
-          (os boot strap generics) ) )
+          (os boot strap generics)
+          (os boot pretty-printing) ) )

@@ -19,11 +19,10 @@
          (define name
            (let* ((gf-object (make <generic>
                                'name:             'name
-                               'signature:        'signature ))
+                               'signature:         signature ))
                   (gf-wrapper (lambda args
                                 (apply (generic-effective-function-ref gf-object)
                                        args ) )) )
-             (add-callable! gf-wrapper gf-object)
-             gf-wrapper ) ) ) ) )
+             (add-callable gf-wrapper gf-object) ) ) ) ) )
 
 ) )

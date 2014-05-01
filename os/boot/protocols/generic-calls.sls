@@ -12,11 +12,15 @@
 
   (import (except (rnrs base) assert)
           (rnrs lists)
+          (rnrs control)
           (only (srfi :1) every)
           (only (rnrs sorting) list-sort)
           (os predicates)
           (os meta accessors)
+          (os internal callables)
           (os internal class-of)
+          (os internal signature-checks)
+          (os boot internal generic-calls)
           (os boot meta classes)
           (os boot meta generics)
           (os boot macros predefine-method)
@@ -25,46 +29,48 @@
 
   (begin
 
-    (predefine-method (add-method! $ generic method) (<generic> <method>)
+    (predefine-method (add-method! $ generic method) `((generic ,<generic>) (method ,<method>))
+      (unless (signatures-coherent? method generic)
+        (error #f "signatures are not coherent"
+          generic method (signature generic) (signature method) ) )
       (set-methods! generic (cons method (methods generic)))
-      (set-effective-function! generic (compute-effective-function generic)) )
+      (set-effective-function! generic
+        (if (eq? <generic> (class-of generic))
+            (compute-effective-function:<generic> (object-of generic))
+            (compute-effective-function generic) ) ) )
 
-    (predefine-method (compute-effective-function $ generic) (<generic>)
+    (predefine-method (compute-effective-function $ generic) `((generic ,<generic>))
       (lambda args
-        (let* ((discriminators (map class-of (discriminator-args generic args)))
-               (applicable-methods (find-applicable-methods generic discriminators))
+        (let* ((arg-classes (map class-of (significant-args generic args)))
+               (applicable-methods (if (eq? <generic> (class-of generic))
+                                       (find-applicable-methods:<generic> (object-of generic) arg-classes)
+                                       (find-applicable-methods generic arg-classes) ))
                (combinator (method-combinator generic))
                (effective-method (compute-effective-method combinator applicable-methods)) )
           (effective-method args) ) ) )
 
-    (define (discriminator-args generic args)
-      (assert (<= (proper-length (signature generic))
-                  (length args) ))
-      (let loop ((result '())
-                 (signature (signature generic))
-                 (args args) )
-        (cond ((or (null? signature)
-                   (symbol? signature) ) (reverse result))
-              ((pair? (car signature))
-               (loop (cons (car args) result)
-                     (cdr signature)
-                     (cdr args) ) )
-              (else (loop result
-                          (cdr signature)
-                          (cdr args) )) ) ) )
+    (define (significant-args generic args)
+      (assert (every (lambda (position) (< position (length args)))
+                     (significant-positions generic) )
+              msg: "Signatures do not agree.\n"
+                   "Signature:" (signature args) "\n"
+                   "Significants:" (significant-positions args) "\n"
+                   "Args:" args )
+      (map (lambda (index) (list-ref args index))
+        (significant-positions generic) ) )
 
-    (predefine-method (find-applicable-methods $ generic classes) (<generic>)
+    (predefine-method (find-applicable-methods $ generic arg-classes) `((generic ,<generic>) arg-classes)
       (let ((all-methods    (methods generic))
-            (applicable?    (lambda (method) (method-applicable? method classes)))
-            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs classes))) )
+            (applicable?    (lambda (method) (method-applicable? method arg-classes)))
+            (more-specific? (lambda (lhs rhs) (more-specific-method? lhs rhs arg-classes))) )
         (list-sort more-specific? (filter applicable? all-methods)) ) )
 
-    (define (method-applicable? method classes)
-      (every nonstrict-subclass? classes (discriminators method)) )
+    (define (method-applicable? method arg-classes)
+      (every nonstrict-subclass? arg-classes (discriminators method)) )
 
     ; lhs < rhs
     (predefine-method (more-specific-method? $ left-m right-m arg-classes)
-                      (<method> <method>)
+                      `((left-m ,<method>) (right-m ,<method>) arg-classes)
       (assert (= (length (discriminators left-m))
                  (length (discriminators right-m))
                  (length arg-classes) ))
@@ -86,13 +92,17 @@
                           (cdr A) )) ) ) )
 
     (predefine-method (compute-effective-method $ combinator methods)
-                      (<linear-method-combinator>)
+                      `((combinator ,<linear-method-combinator>) methods)
       (if (null? methods) (error #f "no applicable methods")
-          (let ((methods (map compute-method-function methods)))
+          (let ((methods (map (lambda (method)
+                                (if (eq? <method> (class-of method))
+                                    (compute-method-function:<method> method)
+                                    (compute-method-function method) ) )
+                           methods )))
             (lambda (args)
               ((car methods) (cdr methods) args) ) ) ) )
 
-    (predefine-method (compute-method-function $ method) (<method>)
+    (predefine-method (compute-method-function $ method) `((method ,<method>))
       (let ((method-body (method-body method)))
         (lambda (next-methods args)
           (apply method-body

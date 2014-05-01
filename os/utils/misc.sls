@@ -4,9 +4,12 @@
   ;   Miscellaneous utility functions
   ;
   (export for-each-with-index
+          indices-of
           graph-bfs
           proper-length
-          implies )
+          proper-filter-map
+          implies
+          both )
 
   (import (except (rnrs base) assert)
           (rnrs control)
@@ -20,6 +23,15 @@
         (unless (null? list)
           (proc index (car list))
           (loop (+ 1 index) (cdr list)) ) ) )
+
+    (define (indices-of pred? list)
+      (let loop ((result '())
+                 (list list)
+                 (index 0) )
+        (cond ((not (pair? list)) (reverse result))
+              ((pred? (car list))
+               (loop (cons index result) (cdr list) (+ 1 index)))
+              (else (loop result (cdr list) (+ 1 index))) ) ) )
 
     (define (graph-bfs root-node adjacent-nodes node-equal?)
       (let loop ((visited-nodes (list root-node))
@@ -46,11 +58,20 @@
     (define (proper-length list)
       (let loop ((list   list)
                  (length 0) )
-        (cond ((null? list)       length)
-              ((not (pair? list)) length)
+        (cond ((not (pair? list)) length)
               (else (loop (cdr list)
                           (+ 1 length) )) ) ) )
 
+    (define (proper-filter-map pred? list)
+      (let loop ((result '())
+                 (list list))
+        (cond ((not (pair? list)) (reverse result))
+              ((pred? (car list)) (loop (cons (pred? (car list)) result)
+                                        (cdr list) ))
+              (else (loop result (cdr list))) ) ) )
+
     (define (implies premise consequence) (or (not premise) consequence))
+
+    (define (both p a b) (and (p a) (p b)))
 
 ) )
