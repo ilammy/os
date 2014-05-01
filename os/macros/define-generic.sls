@@ -23,7 +23,6 @@
                   (gf-wrapper (lambda args
                                 (apply (generic-effective-function-ref gf-object)
                                        args ) )) )
-             (add-callable! gf-wrapper gf-object)
-             gf-wrapper ) ) ) ) )
+             (add-callable gf-wrapper gf-object) ) ) ) ) )
 
 ) )
