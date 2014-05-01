@@ -9,6 +9,7 @@
           (rnrs control)
           (os meta accessors)
           (os internal slot-access)
+          (os internal signature-checks)
           (os boot meta classes)
           (os boot meta generics)
           (os boot macros predefine-method)
@@ -18,6 +19,9 @@
 
     (predefine-method (initialize call-next-method generic initargs) `((generic ,<generic>) initargs)
       (call-next-method)
+
+      (unless (valid-signature? (signature generic))
+        (error #f "invalid signature" generic (signature generic)) )
 
       (set-effective-function! generic
         (lambda args
@@ -30,6 +34,9 @@
 
     (predefine-method (initialize call-next-method method initargs) `((method ,<method>) initargs)
       (call-next-method)
+
+      (unless (valid-signature? (signature method))
+        (error #f "invalid signature" method (signature method)) )
 
       (set-discriminators! method
         (filter-discriminators (signature method)) )

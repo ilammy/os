@@ -12,12 +12,14 @@
 
   (import (except (rnrs base) assert)
           (rnrs lists)
+          (rnrs control)
           (only (srfi :1) every)
           (only (rnrs sorting) list-sort)
           (os predicates)
           (os meta accessors)
           (os internal callables)
           (os internal class-of)
+          (os internal signature-checks)
           (os boot internal generic-calls)
           (os boot meta classes)
           (os boot meta generics)
@@ -28,6 +30,9 @@
   (begin
 
     (predefine-method (add-method! $ generic method) `((generic ,<generic>) (method ,<method>))
+      (unless (signatures-coherent? method generic)
+        (error #f "signatures are not coherent"
+          generic method (signature generic) (signature method) ) )
       (set-methods! generic (cons method (methods generic)))
       (set-effective-function! generic
         (if (eq? <generic> (class-of generic))

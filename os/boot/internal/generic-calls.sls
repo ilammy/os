@@ -18,6 +18,7 @@
           (os internal class-of)
           (os boot meta accessors)
           (os boot meta classes)
+          (os boot internal signature-checks)
           (only (os protocols generic-calls) compute-method-function)
           (os utils assert)
           (os utils misc) )
@@ -28,6 +29,10 @@
       (assert (eq? <generic> (class-of generic))
               (eq? <method> (class-of method)) )
       (let ((generic (object-of generic)))
+        (assert (signatures-coherent? method generic)
+                msg: "Signatures for" (generic-name-ref generic) "are not coherent:"
+                     (method-signature-ref method)
+                     (generic-signature-ref generic) )
         (generic-methods-set! generic (cons method (generic-methods-ref generic)))
         (generic-effective-function-set! generic
           (compute-effective-function:<generic> generic) ) ) )

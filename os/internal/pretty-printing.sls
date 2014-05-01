@@ -14,8 +14,8 @@
 
   (begin
 
-    (define-generic to-write   ((object)))
-    (define-generic to-display ((object)))
+    (define-generic to-write   `((object ,<object>)))
+    (define-generic to-display `((object ,<object>)))
 
     (define-method (to-write $ object) `((object ,<object>))
       (object->string object) )

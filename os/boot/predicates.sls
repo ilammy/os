@@ -1,5 +1,5 @@
 #!r6rs
-(library (os predicates)
+(library (os boot predicates)
   ;
   ;   Class relation predicates
   ;
@@ -9,8 +9,8 @@
 
   (import (except (rnrs base) assert)
           (rnrs lists)
-          (os meta accessors)
-          (os internal class-of) )
+          (os internal class-of)
+          (os boot meta accessors) )
 
   (begin
 
@@ -18,7 +18,7 @@
       (nonstrict-subclass? (class-of object) class) )
 
     (define (subclass? class superclass)
-      (if (memq superclass (all-superclasses class)) #t #f) )
+      (if (memq superclass (class-all-superclasses-ref class)) #t #f) )
 
     (define (nonstrict-subclass? class superclass)
       (or (eq? class superclass)

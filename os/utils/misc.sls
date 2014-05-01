@@ -8,7 +8,8 @@
           graph-bfs
           proper-length
           proper-filter-map
-          implies )
+          implies
+          both )
 
   (import (except (rnrs base) assert)
           (rnrs control)
@@ -70,5 +71,7 @@
               (else (loop result (cdr list))) ) ) )
 
     (define (implies premise consequence) (or (not premise) consequence))
+
+    (define (both p a b) (and (p a) (p b)))
 
 ) )

@@ -10,6 +10,7 @@
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)
+          (os boot internal signature-checks)
           (os utils assert)
           (os utils initargs)
           (os utils misc) )
@@ -40,6 +41,8 @@
       (assert (not (undefined-slot-value? (generic-signature-ref generic)))
               msg: "Required slots of a <generic> are not initialized" )
 
+      (assert (valid-signature? (generic-signature-ref generic)))
+
       (when (undefined-slot-value? (generic-name-ref generic))
         (generic-name-set! generic (string->symbol "#<anonymous>")) )
 
@@ -56,6 +59,6 @@
         (calculate-significant-positions (generic-signature-ref generic)) ) )
 
     (define (calculate-significant-positions signature)
-      (indices-of pair? signature ) )
+      (indices-of list? signature ) )
 
 ) )

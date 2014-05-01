@@ -9,6 +9,7 @@
           (os internal primitives)
           (os boot meta accessors)
           (os boot meta classes)
+          (os boot internal signature-checks)
           (os utils assert)
           (os utils initargs)
           (os utils misc) )
@@ -35,12 +36,14 @@
               (not (undefined-slot-value? (method-body-ref method)))
               msg: "Required slots of a <method> are not initialized" )
 
+      (assert (valid-signature? (method-signature-ref method)))
+
       (method-discriminators-set! method
         (filter-discriminators (method-signature-ref method)) ) )
 
     (define (filter-discriminators signature)
       (proper-filter-map
-        (lambda (spec) (if (pair? spec) (cadr spec) #f))
+        (lambda (spec) (if (list? spec) (cadr spec) #f))
         signature ) )
 
 ) )
