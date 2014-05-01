@@ -65,20 +65,15 @@
     (define (method-applicable? method arg-classes)
       (every nonstrict-subclass?
         arg-classes
-        (method-discriminators method) ) )
-
-    (define (method-discriminators method)
-      (if (eq? <method> (class-of method))
-          (method-discriminators-ref method)
-          (discriminators method) ) )
+        (discriminators method) ) )
 
     ; lhs < rhs
     (define (more-specific-method? left-method right-method argument-classes)
-      (assert (= (length (method-discriminators left-method))
-                 (length (method-discriminators right-method))
+      (assert (= (length (discriminators left-method))
+                 (length (discriminators right-method))
                  (length argument-classes) ))
-      (let loop ((L (method-discriminators left-method))
-                 (R (method-discriminators right-method))
+      (let loop ((L (discriminators left-method))
+                 (R (discriminators right-method))
                  (A argument-classes) )
         (cond ((null? L) #f)
               ((eq? (car L) (car R))
@@ -89,7 +84,7 @@
                           (car R) ) #t)
               ((memq (car R)
                      (memq (car L)
-                           (class-all-superclasses-ref (car A)) ) ) #t)
+                           (all-superclasses (car A)) ) ) #t)
               (else (loop (cdr L)
                           (cdr R)
                           (cdr A) )) ) ) )
@@ -107,7 +102,7 @@
 
     (define (compute-method-function:<method> method)
       (assert (eq? <method> (class-of method)))
-      (let ((method-body (method-body-ref method)))
+      (let ((method-body (method-body method)))
         (lambda (next-methods args)
           (apply method-body
            (if (null? next-methods) #f
