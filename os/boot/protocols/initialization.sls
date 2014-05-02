@@ -57,7 +57,11 @@
       (let ((has-init-value (slot-bound? eslot 'init-value))
             (has-init-thunk (slot-bound? eslot 'init-thunk))
             (init-required  (init-required? eslot))
-            (init-keyword   (init-keyword eslot)) )
+            (init-keyword   (init-keyword eslot))
+            (allocation     (allocation eslot)) )
+
+        (unless (eq? 'instance allocation)
+          (error #f "unsupported slot allocation" (name eslot) allocation) )
 
         (when (and has-init-value has-init-thunk)
           (error #f "slot has both init-value and init-thunk defined" (name eslot) initargs) )

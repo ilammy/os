@@ -53,32 +53,56 @@
       (assert (every (lambda (o) (instance-of? <slot> o)) slots))
       (apply make <effective-slot>
         (append (list 'name: (name (car slots)))
+                (allocation-spec slots)
                 (first-specified-in slots 'init-keyword: 'init-keyword)
                 (first-specified-in slots 'setter:       'setter)
                 (first-specified-in slots 'getter:       'getter)
                 (initialization-spec slots) ) ) )
 
+    ;; allocation's default value is `default` which means 'inherit allocation
+    ;; from the homonymous superclass slot'. If there are no superclasses with
+    ;; such slot then it is treated as `instance`. Also, slot allocation cannot
+    ;; be overriden in subclasses, so we check for this when we have a slot with
+    ;; non-default allocation present.
+    (define (allocation-spec slots)
+      (define (get-allocation slots)
+        (let scan ((slots slots))
+          (if (null? slots) '()
+              (begin
+                (assert (slot-bound? (car slots) 'allocation))
+                (let ((allocation (allocation (car slots))))
+                  (if (eq? 'default allocation) (scan (cdr slots))
+                      (let ((inherited-allocation (get-allocation (cdr slots))))
+                        (if (or (null? inherited-allocation)
+                                (eq? allocation inherited-allocation) )
+                            allocation
+                            (error #f "cannot override allocation of an inherited slot"
+                                   (name (car slots))
+                                   allocation inherited-allocation ) ) ) ) ) ) ) ) )
+      (let ((allocation (get-allocation slots)))
+        (list 'allocation: (if (null? allocation) 'instance allocation)) ) )
+
     ;; init-keyword, getter, and setter slots share the default value: it is #f.
     ;; We are interested in the first explicitly given value in these slots.
     (define (first-specified-in objects init-keyword slot-name)
-      (let loop ((objects objects))
+      (let scan ((objects objects))
         (if (null? objects) '()
-            (let ((object (car objects)))
-              (assert (slot-bound? object slot-name))
-              (let ((value (slot-ref object slot-name)))
+            (begin
+              (assert (slot-bound? (car objects) slot-name))
+              (let ((value (slot-ref (car objects) slot-name)))
                 (if value (list init-keyword value)
-                          (loop (cdr objects)) ) ) ) ) ) )
+                          (scan (cdr objects)) ) ) ) ) ) )
 
     ;; Slot is default-initialized with either a value or a thunk, whichever
     ;; is defined in the latest (first-met) slot specification. However, an
     ;; explicit initialization demand has top priority.
     (define (initialization-spec slots)
-      (let loop ((slots slots))
+      (let scan ((slots slots))
         (cond ((null? slots) '())
               ((init-required? (car slots))          '(init-required: #t))
               ((slot-bound? (car slots) 'init-value) (list 'init-value: (init-value (car slots))))
               ((slot-bound? (car slots) 'init-thunk) (list 'init-thunk: (init-thunk (car slots))))
-              (else (loop (cdr slots))) ) ) )
+              (else (scan (cdr slots))) ) ) )
 
     (define (group-slots-by-name class)
       (let ((hash (make-hash-table eq?)))

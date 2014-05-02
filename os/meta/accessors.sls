@@ -10,6 +10,7 @@
           init-required?
           init-value
           init-thunk
+          allocation
           getter
           setter
           signature
@@ -45,6 +46,7 @@
     (def-ref-set init-required         init-required?)
     (def-ref-set init-value            init-value)
     (def-ref-set init-thunk            init-thunk)
+    (def-ref-set allocation            allocation)
     (def-ref-set getter                getter)
     (def-ref-set setter                setter)
     (def-ref-set signature             signature)

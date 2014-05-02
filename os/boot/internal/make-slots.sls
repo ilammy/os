@@ -16,8 +16,8 @@
 
   (begin
 
-    (define <slot>-instance-size           7)
-    (define <effective-slot>-instance-size 9)
+    (define <slot>-instance-size           8)
+    (define <effective-slot>-instance-size 10)
 
     (define (make-slot . initargs)
       (let ((slot (make-primitive <slot> <slot>-instance-size)))
@@ -35,6 +35,7 @@
         (lambda (key value)
           (case key
             ((name:)          (slot-name-set!          slot value))
+            ((allocation:)    (slot-allocation-set!    slot value))
             ((init-keyword:)  (slot-init-keyword-set!  slot value))
             ((init-required:) (slot-init-required-set! slot value))
             ((init-value:)    (slot-init-value-set!    slot value))
@@ -43,6 +44,10 @@
             ((setter:)        (slot-setter-set!        slot value))
             (else (assert #f msg: "Unknown init keyword used for <slot>:" key)) ) )
         initargs )
+
+      (when (or (undefined-slot-value? (slot-allocation-ref slot))
+                (eq? 'default (slot-allocation-ref slot)) )
+        (slot-allocation-set! slot 'instance) )
 
       (when (undefined-slot-value? (slot-init-keyword-ref slot))
         (slot-init-keyword-set! slot #f) )
@@ -62,7 +67,11 @@
       (let ((has-init-value (not (undefined-slot-value? (slot-init-value-ref slot))))
             (has-init-thunk (not (undefined-slot-value? (slot-init-thunk-ref slot))))
             (init-required  (slot-init-required-ref slot))
-            (init-keyword   (slot-init-keyword-ref slot)) )
+            (init-keyword   (slot-init-keyword-ref slot))
+            (allocation     (slot-allocation-ref slot)) )
+
+        (assert (eq? 'instance allocation)
+                msg: allocation "allocation is not supported for predefined slots" )
 
         (assert (not (and has-init-value has-init-thunk))
                 msg: "A slot cannot have both init-value and init-thunk defined" )

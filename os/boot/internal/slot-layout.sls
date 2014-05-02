@@ -58,6 +58,11 @@
                    'init-required: #t
                    'getter:        name )
 
+        (make-slot 'name:         'allocation
+                   'init-keyword: 'allocation:
+                   'init-value:   'default
+                   'getter:        allocation )
+
         (make-slot 'name:         'init-keyword
                    'init-keyword: 'init-keyword:
                    'init-value:    #f
