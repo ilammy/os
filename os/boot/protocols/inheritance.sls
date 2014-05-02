@@ -17,6 +17,7 @@
           (os predicates)
           (os meta accessors)
           (os internal callables)
+          (os internal class-of)
           (os internal primitives)
           (os internal slot-access)
           (os boot meta classes)
@@ -138,39 +139,70 @@
     (predefine-method (install-direct-accessors! $ class all-slots slot-groups)
                       `((class ,<class>) all-slots slot-groups)
       (assert (= (length all-slots) (length slot-groups)))
-      (let ((instance-slots (filter (slots-of 'instance) all-slots)))
+      (let ((instance-slots (filter (slots-of 'instance) all-slots))
+            (per-class-slots (filter (slots-of 'each-subclass) all-slots)) )
         (for-each-with-index
           (lambda (index slot)
             (let-values (((getter setter) (compute-direct-instance-accessors class index)))
               (set-direct-getter! slot getter)
               (set-direct-setter! slot setter) ) )
-          instance-slots ) ) )
+          instance-slots )
 
-    (define-syntax checked-ref
+        (let ((per-class-storage (make-uninitialized-vector (length per-class-slots))))
+          (for-each-with-index
+            (lambda (index slot)
+              (let-values (((getter setter) (compute-direct-per-class-accessors
+                                              class per-class-storage index )))
+                (set-direct-getter! slot getter)
+                (set-direct-setter! slot setter) ) )
+            per-class-slots ) ) ) )
+
+    (define-syntax class-check
+      (syntax-rules ()
+        ((_ expected-class object)
+         (assert (eq? expected-class (class-of object))
+                 msg: "Invalid object class in direct accessor:" (class-of object)
+                      "expected:" expected-class ) ) ) )
+
+    (define-syntax checked-instance-ref
       (syntax-rules ()
         ((_ expected-class object index)
-         (begin (assert (primitive? object)
-                        (eq? (primitive-class object) expected-class)
-                        msg: "Invalid object passed to direct accessor" )
+         (begin (assert (primitive? object))
+                (class-check expected-class object)
                 (primitive-ref object index) ) ) ) )
 
-    (define-syntax checked-set!
+    (define-syntax checked-instance-set!
       (syntax-rules ()
         ((_ expected-class object index value)
-         (begin (assert (primitive? object)
-                        (eq? (primitive-class object) expected-class)
-                        msg: "Invalid object passed to direct accessor" )
+         (begin (assert (primitive? object))
+                (class-check expected-class object)
                 (primitive-set! object index value) ) ) ) )
 
     (predefine-method (compute-direct-instance-accessors $ class slot-index)
                       `((class ,<class>) slot-index)
-      (values (lambda (o)   (checked-ref  class o slot-index))
-              (lambda (o v) (checked-set! class o slot-index v)) ) )
+      (values (lambda (o)   (checked-instance-ref  class o slot-index))
+              (lambda (o v) (checked-instance-set! class o slot-index v)) ) )
 
     (predefine-method (compute-direct-instance-accessors $ callable slot-index)
                       `((callable ,<procedure>) slot-index)
-      (values (lambda (o)   (checked-ref  callable (object-of o) slot-index))
-              (lambda (o v) (checked-set! callable (object-of o) slot-index v)) ) )
+      (values (lambda (o)   (checked-instance-ref  callable (object-of o) slot-index))
+              (lambda (o v) (checked-instance-set! callable (object-of o) slot-index v)) ) )
+
+    (define-syntax checked-storage-ref
+      (syntax-rules ()
+        ((_ expected-class object storage index)
+         (begin (class-check expected-class object)
+                (vector-ref storage index) ) ) ) )
+
+    (define-syntax checked-storage-set!
+      (syntax-rules ()
+        ((_ expected-class object storage index value)
+         (begin (class-check expected-class object)
+                (vector-set! storage index value) ) ) ) )
+
+    (define (compute-direct-per-class-accessors class storage index)
+      (values (lambda (o)   (checked-storage-ref  class o storage index))
+              (lambda (o v) (checked-storage-set! class o storage index v)) ) )
 
     'dummy
 ) )

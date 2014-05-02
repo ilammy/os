@@ -5,6 +5,7 @@
   ;
   (export make
             allocate
-            initialize )
+            initialize
+              initialize-with-initargs-in-class! )
 
     (import (os boot meta generics)) )

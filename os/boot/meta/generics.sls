@@ -6,6 +6,7 @@
   (export make
             allocate
             initialize
+              initialize-with-initargs-in-class!
 
           slot-ref-in-class
           slot-set-in-class!
@@ -35,6 +36,8 @@
     (predefine-generic make       `((class  ,<class>) . initargs))
     (predefine-generic allocate   `((class  ,<class>)   initargs))
     (predefine-generic initialize `((object ,<object>)  initargs))
+    (predefine-generic initialize-with-initargs-in-class!
+                                  `((class ,<class>) slot object initargs) )
 
     ; protocols/slot-access
     ;

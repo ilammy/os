@@ -5,7 +5,8 @@
   ;
   (export make
             allocate
-            initialize )
+            initialize
+              initialize-with-initargs-in-class! )
 
   (import (except (rnrs base) assert)
           (rnrs control)
@@ -16,6 +17,7 @@
           (os boot meta classes)
           (os boot meta generics)
           (os boot macros predefine-method)
+          (os utils assert)
           (os utils initargs) )
 
   (begin
@@ -27,24 +29,26 @@
       (make-primitive class (instance-size class)) )
 
     (predefine-method (initialize $ object initargs) `((object ,<object>) initargs)
-      (for-each
-        (lambda (slot)
-          (init-slot-with-initargs! slot object initargs) )
-        (all-slots (class-of object)) )
+      (let ((class (class-of object)))
+        (for-each
+          (lambda (slot)
+            (initialize-with-initargs-in-class! class slot object initargs) )
+          (all-slots class) ) )
       object )
 
-    (define (init-slot-with-initargs! slot object initargs)
+    (predefine-method (initialize-with-initargs-in-class! $ class slot object initargs)
+                      `((class ,<class>) slot object initargs)
       (define (init-with-keyword keyword)
         (let-values (((keyword-found? value) (get-initarg keyword initargs)))
           (if keyword-found?
-              (values #t value)
+              (values 'with-keyword value)
               (init-with-default-value) ) ) )
 
       (define (init-with-default-value)
         (if (slot-bound? slot 'init-value)
-            (values #t (init-value slot))
+            (values 'default (init-value slot))
             (if (slot-bound? slot 'init-thunk)
-                (values #t ((init-thunk slot)))
+                (values 'default ((init-thunk slot)))
                 (values #f #f) ) ) )
 
       (define (compute-init-value)
@@ -53,10 +57,23 @@
               (init-with-keyword keyword)
               (init-with-default-value) ) ) )
 
-      (let-values (((can-init? value) (compute-init-value)))
-        (if can-init?
-            (let ((slot-set! (direct-setter slot)))
-              (slot-set! object value) )
+      (define (init-slot-with! value)
+        (let ((slot-set! (direct-setter slot)))
+          (slot-set! object value) ) )
+
+      (define (slot-is-not-initialized?)
+        (let ((slot-get (direct-getter slot)))
+          (undefined-slot-value? (slot-get object)) ) )
+
+      (let-values (((can-init value) (compute-init-value)))
+        (if can-init
+            (case (allocation slot)
+              ((instance) (init-slot-with! value))
+              ((each-subclass) (when (or (slot-is-not-initialized?)
+                                         (eq? can-init 'with-keyword) )
+                                 (init-slot-with! value) ))
+              (else (assert #f msg: "unexpected invalid slot allocation"
+                                    (name class) (name slot) (allocation slot) )) )
             (when (init-required? slot)
               (error #f "no init value provided for a required slot"
                      (name (class-of object)) (name slot) ) ) ) ) )

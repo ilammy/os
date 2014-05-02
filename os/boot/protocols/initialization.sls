@@ -7,6 +7,7 @@
 
   (import (except (rnrs base) assert)
           (rnrs control)
+          (only (srfi :1) any)
           (os meta accessors)
           (os internal slot-access)
           (os internal signature-checks)
@@ -60,7 +61,8 @@
             (init-keyword   (init-keyword eslot))
             (allocation     (allocation eslot)) )
 
-        (unless (eq? 'instance allocation)
+        (unless (any (lambda (x) (eq? allocation x))
+                  '(instance each-subclass) )
           (error #f "unsupported slot allocation" (name eslot) allocation) )
 
         (when (and has-init-value has-init-thunk)

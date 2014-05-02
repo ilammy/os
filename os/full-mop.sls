@@ -6,6 +6,7 @@
   (export make
             allocate
             initialize
+              initialize-with-initargs-in-class!
 
           slot-ref-in-class
           slot-set-in-class!
