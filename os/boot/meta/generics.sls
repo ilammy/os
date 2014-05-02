@@ -14,9 +14,8 @@
           compute-all-superclasses
           compute-all-slots
             compute-effective-slot
+            install-direct-accessors!
           compute-instance-size
-          finalize-slot-descriptors!
-            compute-direct-slot-accessors
 
           add-method!
             compute-effective-function
@@ -45,12 +44,11 @@
 
     ; protocols/inheritance
     ;
-    (predefine-generic compute-all-superclasses      `((class ,<class>)))
-    (predefine-generic compute-all-slots             `((class ,<class>)))
-    (predefine-generic compute-effective-slot        `((class ,<class>) slots))
-    (predefine-generic compute-instance-size         `((class ,<class>)))
-    (predefine-generic finalize-slot-descriptors!    `((class ,<class>)))
-    (predefine-generic compute-direct-slot-accessors `((class ,<class>) (slot ,<effective-slot>)))
+    (predefine-generic compute-all-superclasses   `((class ,<class>)))
+    (predefine-generic compute-all-slots          `((class ,<class>)))
+    (predefine-generic compute-effective-slot     `((class ,<class>) slot-groups))
+    (predefine-generic install-direct-accessors!  `((class ,<class>) all-slots slot-groups))
+    (predefine-generic compute-instance-size      `((class ,<class>)))
 
     ; protocols/generic-calls
     ;

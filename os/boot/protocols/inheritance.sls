@@ -7,13 +7,12 @@
             compute-all-superclasses
             compute-all-slots
               compute-effective-slot
-            compute-instance-size
-            finalize-slot-descriptors!
-              compute-direct-slot-accessors )
+              install-direct-accessors!
+            compute-instance-size )
 
   (import (except (rnrs base) assert)
           (compatibility mlist)
-          (only (srfi :1) find list-index every)
+          (only (srfi :1) count every find filter list-index)
           (srfi :69) ; hash-tables
           (os predicates)
           (os meta accessors)
@@ -22,6 +21,7 @@
           (os internal slot-access)
           (os boot meta classes)
           (os boot meta generics)
+          (os boot macros predefine-generic)
           (os boot macros predefine-method)
           (os utils assert)
           (os utils initargs)
@@ -35,7 +35,6 @@
       (set-all-superclasses! class (compute-all-superclasses class))
       (set-all-slots!        class (compute-all-slots class))
       (set-instance-size!    class (compute-instance-size class))
-      (finalize-slot-descriptors! class)
 
       class )
 
@@ -44,13 +43,15 @@
       (cdr (graph-bfs class direct-superclasses eq?)) )
 
     (predefine-method (compute-all-slots $ class) `((class ,<class>))
-      (map (lambda (slots)
-             (compute-effective-slot class slots) )
-        (group-slots-by-name class) ) )
+      (let* ((slot-groups (group-slots-by-name class))
+             (all-slots (map (lambda (group) (compute-effective-slot class group))
+                             slot-groups )) )
+        (install-direct-accessors! class all-slots slot-groups)
+        all-slots ) )
 
     (predefine-method (compute-effective-slot $ class slots) `((class ,<class>) slots)
       (assert (not (null? slots)))
-      (assert (every (lambda (o) (instance-of? <slot> o)) slots))
+      (assert (every (lambda (slot) (instance-of? <slot> slot)) slots))
       (apply make <effective-slot>
         (append (list 'name: (name (car slots)))
                 (allocation-spec slots)
@@ -126,16 +127,24 @@
 
         (map reverse (list->mlist (hash-table-values hash))) ) )
 
-    (predefine-method (compute-instance-size $ class) `((class ,<class>))
-      (length (all-slots class)) )
+    (define (slots-of an-allocation)
+      (lambda (slot) (eq? an-allocation (allocation slot))) )
 
-    (predefine-method (finalize-slot-descriptors! $ class) `((class ,<class>))
-      (for-each
-        (lambda (slot)
-          (let-values (((getter setter) (compute-direct-slot-accessors class slot)))
-            (set-direct-getter! slot getter)
-            (set-direct-setter! slot setter) ) )
-        (all-slots class) ) )
+    (predefine-method (compute-instance-size $ class) `((class ,<class>))
+      (count (slots-of 'instance) (all-slots class)) )
+
+    (predefine-generic compute-direct-instance-accessors `((class ,<class>) slot-index))
+
+    (predefine-method (install-direct-accessors! $ class all-slots slot-groups)
+                      `((class ,<class>) all-slots slot-groups)
+      (assert (= (length all-slots) (length slot-groups)))
+      (let ((instance-slots (filter (slots-of 'instance) all-slots)))
+        (for-each-with-index
+          (lambda (index slot)
+            (let-values (((getter setter) (compute-direct-instance-accessors class index)))
+              (set-direct-getter! slot getter)
+              (set-direct-setter! slot setter) ) )
+          instance-slots ) ) )
 
     (define-syntax checked-ref
       (syntax-rules ()
@@ -153,17 +162,15 @@
                         msg: "Invalid object passed to direct accessor" )
                 (primitive-set! object index value) ) ) ) )
 
-    (predefine-method (compute-direct-slot-accessors $ class slot)
-                      `((class ,<class>) (slot ,<effective-slot>))
-      (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots class))))
-        (values (lambda (o)   (checked-ref  class o index))
-                (lambda (o v) (checked-set! class o index v)) ) ) )
+    (predefine-method (compute-direct-instance-accessors $ class slot-index)
+                      `((class ,<class>) slot-index)
+      (values (lambda (o)   (checked-ref  class o slot-index))
+              (lambda (o v) (checked-set! class o slot-index v)) ) )
 
-    (predefine-method (compute-direct-slot-accessors $ callable slot)
-                      `((callable ,<procedure>) (slot ,<effective-slot>))
-      (let ((index (list-index (lambda (x) (eq? x slot)) (all-slots callable))))
-        (values (lambda (o)   (checked-ref  callable (object-of o) index))
-                (lambda (o v) (checked-set! callable (object-of o) index v)) ) ) )
+    (predefine-method (compute-direct-instance-accessors $ callable slot-index)
+                      `((callable ,<procedure>) slot-index)
+      (values (lambda (o)   (checked-ref  callable (object-of o) slot-index))
+              (lambda (o v) (checked-set! callable (object-of o) slot-index v)) ) )
 
     'dummy
 ) )

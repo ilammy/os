@@ -14,9 +14,8 @@
           compute-all-superclasses
           compute-all-slots
             compute-effective-slot
+            install-direct-accessors!
           compute-instance-size
-          finalize-slot-descriptors!
-            compute-direct-slot-accessors
 
           add-method!
             compute-effective-function
