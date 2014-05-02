@@ -32,16 +32,10 @@
     ;; ones already mixed into some concrete classes) is a good one, so we treat
     ;; such classes as valid method specializers for any generic specializer.
     ;;
-    ;; TODO: At the moment 'mixin' = 'direct and only subclass of <object>'.
-    ;;       This should be refined in future when proper abstract classes are
-    ;;       implemented. Then 'mixin' can be defined as 'any abstract class'.
-    ;;
     (define (coherent-specializer? method-specializer generic-specializer)
       (assert (specializer? method-specializer)
               (specializer? generic-specializer) )
-      (or (let ((superclasses (all-superclasses method-specializer)))
-            (and (= 1 (length superclasses))
-                 (eq? <object> (car superclasses)) ) )
+      (or (abstract? method-specializer)
           (nonstrict-subclass? method-specializer generic-specializer) ) )
 
     (define (signatures-coherent? method generic)
