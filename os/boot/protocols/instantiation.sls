@@ -69,9 +69,10 @@
         (if can-init
             (case (allocation slot)
               ((instance) (init-slot-with! value))
-              ((each-subclass) (when (or (slot-is-not-initialized?)
-                                         (eq? can-init 'with-keyword) )
-                                 (init-slot-with! value) ))
+              ((class each-subclass)
+               (when (or (slot-is-not-initialized?)
+                         (eq? can-init 'with-keyword) )
+                 (init-slot-with! value) ) )
               (else (assert #f msg: "unexpected invalid slot allocation"
                                     (name class) (name slot) (allocation slot) )) )
             (when (init-required? slot)

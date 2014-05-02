@@ -11,8 +11,9 @@
             compute-instance-size )
 
   (import (except (rnrs base) assert)
+          (rnrs control)
           (compatibility mlist)
-          (only (srfi :1) count every find filter list-index)
+          (only (srfi :1) any count every find filter partition)
           (srfi :69) ; hash-tables
           (os predicates)
           (os meta accessors)
@@ -44,10 +45,10 @@
       (cdr (graph-bfs class direct-superclasses eq?)) )
 
     (predefine-method (compute-all-slots $ class) `((class ,<class>))
-      (let* ((slot-groups (group-slots-by-name class))
-             (all-slots (map (lambda (group) (compute-effective-slot class group))
-                             slot-groups )) )
-        (install-direct-accessors! class all-slots slot-groups)
+      (let ((all-slots (map (lambda (group)
+                              (compute-effective-slot class group) )
+                         (group-slots-by-name class) )))
+        (install-direct-accessors! class all-slots)
         all-slots ) )
 
     (predefine-method (compute-effective-slot $ class slots) `((class ,<class>) slots)
@@ -134,33 +135,94 @@
     (predefine-method (compute-instance-size $ class) `((class ,<class>))
       (count (slots-of 'instance) (all-slots class)) )
 
+    (predefine-method (install-direct-accessors! $ class all-slots)
+                      `((class ,<class>) all-slots)
+      ;; Per instance slots
+      (let ((instance-slots (filter (slots-of 'instance) all-slots)))
+        (install-instance-storage-accessors! class instance-slots) )
+
+      ;; Per class metaobject slots
+      (let ((per-class-slots (filter (slots-of 'each-subclass) all-slots)))
+        (unless (null? per-class-slots)
+          (let ((per-class-storage (make-uninitialized-vector (length per-class-slots))))
+            (install-class-storage-accessors! class per-class-storage per-class-slots) ) ) )
+
+      ;; Per lineage slots
+      (let ((shared-class-slots (filter (slots-of 'class) all-slots)))
+        (let-values (((direct-slots inherited-slots)
+                      (partition-shared-class-slots class shared-class-slots) ))
+          (unless (null? direct-slots)
+            (let ((shared-class-storage (make-uninitialized-vector (length direct-slots))))
+              (install-shared-storage-accessors! class shared-class-storage direct-slots) ) )
+
+          (inherit-shared-storage-accessors! class inherited-slots) ) ) )
+
+    (define (partition-shared-class-slots class slots)
+      (define class-direct-slots (direct-slots class))
+
+      (define (slot-with-name a-name)
+        (lambda (slot)
+          (eq? a-name (name slot)) ) )
+
+      (define (direct-slot? slot)
+        (any (slot-with-name (name slot))
+          class-direct-slots ) )
+
+      (partition direct-slot? slots) )
+
     (predefine-generic compute-direct-instance-accessors `((class ,<class>) slot-index))
 
-    (predefine-method (install-direct-accessors! $ class all-slots slot-groups)
-                      `((class ,<class>) all-slots slot-groups)
-      (assert (= (length all-slots) (length slot-groups)))
-      (let ((instance-slots (filter (slots-of 'instance) all-slots))
-            (per-class-slots (filter (slots-of 'each-subclass) all-slots)) )
-        (for-each-with-index
-          (lambda (index slot)
-            (let-values (((getter setter) (compute-direct-instance-accessors class index)))
-              (set-direct-getter! slot getter)
-              (set-direct-setter! slot setter) ) )
-          instance-slots )
+    (define (install-instance-storage-accessors! class slots)
+      (for-each-with-index
+        (lambda (index slot)
+          (let-values (((getter setter) (compute-direct-instance-accessors class index)))
+            (set-direct-getter! slot getter)
+            (set-direct-setter! slot setter) ) )
+        slots ) )
 
-        (let ((per-class-storage (make-uninitialized-vector (length per-class-slots))))
-          (for-each-with-index
-            (lambda (index slot)
-              (let-values (((getter setter) (compute-direct-per-class-accessors
-                                              class per-class-storage index )))
-                (set-direct-getter! slot getter)
-                (set-direct-setter! slot setter) ) )
-            per-class-slots ) ) ) )
+    (define (install-class-storage-accessors! class storage slots)
+      (for-each-with-index
+        (lambda (index slot)
+          (let-values (((getter setter) (compute-direct-class-accessors class storage index)))
+            (set-direct-getter! slot getter)
+            (set-direct-setter! slot setter) ) )
+        slots ) )
+
+    (define (install-shared-storage-accessors! class storage slots)
+      (for-each-with-index
+        (lambda (index slot)
+          (let-values (((getter setter) (compute-shared-class-accessors class storage index)))
+            (set-direct-getter! slot getter)
+            (set-direct-setter! slot setter) ) )
+        slots ) )
+
+    (define (inherit-shared-storage-accessors! class slots)
+      (for-each
+        (lambda (goal-slot)
+          (define (original-slot test-slot)
+            (if (eq? (name test-slot) (name goal-slot))
+                test-slot
+                #f ) )
+          (let scan ((supers (direct-superclasses class)))
+            (assert (not (null? supers)) msg: "Missing inherited slot")
+            (let ((found-slot (find original-slot (all-slots (car supers)))))
+              (if found-slot
+                  (begin (set-direct-getter! goal-slot (direct-getter found-slot))
+                         (set-direct-setter! goal-slot (direct-setter found-slot)) )
+                  (scan (cdr supers)) ) ) ) )
+        slots ) )
 
     (define-syntax class-check
       (syntax-rules ()
         ((_ expected-class object)
          (assert (eq? expected-class (class-of object))
+                 msg: "Invalid object class in direct accessor:" (class-of object)
+                      "expected:" expected-class ) ) ) )
+
+    (define-syntax subclass-check
+      (syntax-rules ()
+        ((_ expected-class object)
+         (assert (instance-of? expected-class object)
                  msg: "Invalid object class in direct accessor:" (class-of object)
                       "expected:" expected-class ) ) ) )
 
@@ -200,9 +262,25 @@
          (begin (class-check expected-class object)
                 (vector-set! storage index value) ) ) ) )
 
-    (define (compute-direct-per-class-accessors class storage index)
+    (define (compute-direct-class-accessors class storage index)
       (values (lambda (o)   (checked-storage-ref  class o storage index))
               (lambda (o v) (checked-storage-set! class o storage index v)) ) )
+
+    (define-syntax checked-shared-storage-ref
+      (syntax-rules ()
+        ((_ expected-class object storage index)
+         (begin (subclass-check expected-class object)
+                (vector-ref storage index) ) ) ) )
+
+    (define-syntax checked-shared-storage-set!
+      (syntax-rules ()
+        ((_ expected-class object storage index value)
+         (begin (subclass-check expected-class object)
+                (vector-set! storage index value) ) ) ) )
+
+    (define (compute-shared-class-accessors class storage index)
+      (values (lambda (o)   (checked-shared-storage-ref  class o storage index))
+              (lambda (o v) (checked-shared-storage-set! class o storage index v)) ) )
 
     'dummy
 ) )

@@ -62,7 +62,7 @@
             (allocation     (allocation eslot)) )
 
         (unless (any (lambda (x) (eq? allocation x))
-                  '(instance each-subclass) )
+                  '(instance class each-subclass) )
           (error #f "unsupported slot allocation" (name eslot) allocation) )
 
         (when (and has-init-value has-init-thunk)

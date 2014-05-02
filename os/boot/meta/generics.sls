@@ -50,7 +50,7 @@
     (predefine-generic compute-all-superclasses   `((class ,<class>)))
     (predefine-generic compute-all-slots          `((class ,<class>)))
     (predefine-generic compute-effective-slot     `((class ,<class>) slot-groups))
-    (predefine-generic install-direct-accessors!  `((class ,<class>) all-slots slot-groups))
+    (predefine-generic install-direct-accessors!  `((class ,<class>) all-slots))
     (predefine-generic compute-instance-size      `((class ,<class>)))
 
     ; protocols/generic-calls
