@@ -43,6 +43,11 @@
                    'init-required: #t
                    'getter:        direct-slots )
 
+        (make-slot 'name:         'abstract?
+                   'init-keyword: 'abstract:
+                   'init-value:    #f
+                   'getter:        abstract? )
+
         (make-slot 'name:         'all-superclasses
                    'getter:        all-superclasses )
 

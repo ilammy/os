@@ -18,6 +18,7 @@
           name
           direct-superclasses
           direct-slots
+          abstract?
           init-keyword
           init-value
           init-thunk

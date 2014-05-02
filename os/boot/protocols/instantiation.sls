@@ -21,6 +21,8 @@
   (begin
 
     (predefine-method (make $ class . initargs) `((class ,<class>) . initargs)
+      (when (abstract? class)
+        (error #f "cannot instantiate an abstract class" class) )
       (initialize (allocate class initargs) initargs) )
 
     (predefine-method (allocate $ class initargs) `((class ,<class>) initargs)
