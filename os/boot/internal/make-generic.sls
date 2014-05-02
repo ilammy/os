@@ -17,7 +17,7 @@
 
   (begin
 
-    (define <generic>-instance-size                  6)
+    (define <generic>-instance-size                  7)
     (define <linear-method-combinator>-instance-size 0)
 
     (define (make-default-method-combinator)
@@ -46,10 +46,9 @@
       (when (undefined-slot-value? (generic-name-ref generic))
         (generic-name-set! generic (string->symbol "#<anonymous>")) )
 
-      (when (undefined-slot-value? (generic-method-combinator-ref generic))
-        (generic-method-combinator-set! generic (make-default-method-combinator)) )
-
-      (generic-methods-set! generic '())
+      (generic-methods-set!           generic '())
+      (generic-method-class-set!      generic <method>)
+      (generic-method-combinator-set! generic (make-default-method-combinator))
 
       (generic-effective-function-set! generic
         (lambda args
