@@ -10,7 +10,8 @@
           (os macros define-method)
           (os meta accessors)
           (os meta classes)
-          (os internal class-of) )
+          (os internal class-of)
+          (os internal slot-access) )
 
   (begin
 
@@ -39,8 +40,9 @@
       (string-trim-right (string-trim string left) right) )
 
     (define (has-slot? slot-name object)
-      (any (lambda (slot) (eq? slot-name (name slot)))
-        (all-slots (class-of object)) ) )
+      (and (any (lambda (slot) (eq? slot-name (name slot)))
+             (all-slots (class-of object)) )
+           (slot-bound? object slot-name) ) )
 
     'dummy
 ) )
