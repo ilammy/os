@@ -62,8 +62,13 @@
             (allocation     (allocation eslot)) )
 
         (unless (any (lambda (x) (eq? allocation x))
-                  '(instance class each-subclass) )
+                  '(instance class each-subclass virtual) )
           (error #f "unsupported slot allocation" (name eslot) allocation) )
+
+        (when (and (eq? allocation 'virtual)
+                   (or init-keyword init-required
+                       has-init-value has-init-thunk ) )
+          (error #f "virtual slots cannot have initialization specifiers" (name eslot) initargs) )
 
         (when (and has-init-value has-init-thunk)
           (error #f "slot has both init-value and init-thunk defined" (name eslot) initargs) )

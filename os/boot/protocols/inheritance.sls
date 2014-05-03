@@ -150,14 +150,20 @@
       ;; Per lineage slots
       (let ((shared-class-slots (filter (slots-of 'class) all-slots)))
         (let-values (((direct-slots inherited-slots)
-                      (partition-shared-class-slots class shared-class-slots) ))
+                      (partition-direct-slots class shared-class-slots) ))
           (unless (null? direct-slots)
             (let ((shared-class-storage (make-uninitialized-vector (length direct-slots))))
               (install-shared-storage-accessors! class shared-class-storage direct-slots) ) )
 
-          (inherit-shared-storage-accessors! class inherited-slots) ) ) )
+          (inherit-direct-slot-accessors! class inherited-slots) ) )
 
-    (define (partition-shared-class-slots class slots)
+      (let ((virtual-slots (filter (slots-of 'virtual) all-slots)))
+        (let-values (((direct-slots inherited-slots)
+                      (partition-direct-slots class virtual-slots) ))
+          (install-virtual-slot-accessors! class direct-slots)
+          (inherit-direct-slot-accessors! class inherited-slots) ) ) )
+
+    (define (partition-direct-slots class slots)
       (define class-direct-slots (direct-slots class))
 
       (define (slot-with-name a-name)
@@ -196,7 +202,7 @@
             (set-direct-setter! slot setter) ) )
         slots ) )
 
-    (define (inherit-shared-storage-accessors! class slots)
+    (define (inherit-direct-slot-accessors! class slots)
       (for-each
         (lambda (goal-slot)
           (define (original-slot test-slot)
@@ -210,6 +216,15 @@
                   (begin (set-direct-getter! goal-slot (direct-getter found-slot))
                          (set-direct-setter! goal-slot (direct-setter found-slot)) )
                   (scan (cdr supers)) ) ) ) )
+        slots ) )
+
+    (define (install-virtual-slot-accessors! class slots)
+      (for-each
+        (lambda (slot)
+          (predefine-generic get `((object ,class)))
+          (predefine-generic set `((object ,class) value))
+          (set-direct-getter! slot get)
+          (set-direct-setter! slot set) )
         slots ) )
 
     (define-syntax class-check
