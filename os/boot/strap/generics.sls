@@ -27,6 +27,8 @@
 
   (import (os boot meta generics)
           (os boot protocols inheritance)
+          (os boot protocols slot-allocation)
+          (os boot protocols slot-initialization)
           (os boot protocols instantiation)
           (os boot protocols initialization)
           (os boot protocols generic-calls)

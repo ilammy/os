@@ -62,7 +62,7 @@
             (allocation     (allocation eslot)) )
 
         (unless (any (lambda (x) (eq? allocation x))
-                  '(instance class each-subclass virtual) )
+                  '(instance each-subclass class-lineage virtual) )
           (error #f "unsupported slot allocation" (name eslot) allocation) )
 
         (when (and (eq? allocation 'virtual)

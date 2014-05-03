@@ -43,7 +43,8 @@
                    (class-of (generic-method-combinator-ref generic)) )
               msg: "Method combinator"
                    (class-name-ref (class-of (generic-method-combinator-ref generic)))
-                   "is not expected for predefined generics" )
+                   "is not expected for predefined generic function"
+                   (generic-name-ref generic) )
       (lambda args
         (let* ((arg-classes (map class-of (significant-args generic args)))
                (applicable-methods (find-applicable-methods:<generic> generic arg-classes))
