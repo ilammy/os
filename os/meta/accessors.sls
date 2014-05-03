@@ -14,6 +14,7 @@
           getter
           setter
           signature
+          method-class
           method-combinator
           method-body
           all-superclasses      set-all-superclasses!
@@ -50,6 +51,7 @@
     (def-ref-set getter                getter)
     (def-ref-set setter                setter)
     (def-ref-set signature             signature)
+    (def-ref-set method-class          method-class)
     (def-ref-set method-combinator     method-combinator)
     (def-ref-set method-body           method-body)
 

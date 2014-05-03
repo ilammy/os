@@ -26,6 +26,7 @@
           getter
           setter
           signature
+          method-class
           method-combinator
           discriminators
           all-superclasses

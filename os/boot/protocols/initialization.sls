@@ -7,6 +7,7 @@
 
   (import (except (rnrs base) assert)
           (rnrs control)
+          (os predicates)
           (os meta accessors)
           (os internal slot-access)
           (os internal signature-checks)
@@ -22,6 +23,9 @@
 
       (unless (valid-signature? (signature generic))
         (error #f "invalid signature" generic (signature generic)) )
+
+      (unless (nonstrict-subclass? (method-class generic) <method>)
+        (error #f "invalid method class" generic (method-class generic)) )
 
       (set-effective-function! generic
         (lambda args

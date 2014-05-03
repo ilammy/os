@@ -33,6 +33,7 @@
                 msg: "Signatures for" (generic-name-ref generic) "are not coherent:"
                      (method-signature-ref method)
                      (generic-signature-ref generic) )
+        (assert (eq? <method> (generic-method-class-ref generic)))
         (generic-methods-set! generic (cons method (generic-methods-ref generic)))
         (generic-effective-function-set! generic
           (compute-effective-function:<generic> generic) ) ) )

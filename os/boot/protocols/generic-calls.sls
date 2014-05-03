@@ -33,6 +33,10 @@
       (unless (signatures-coherent? method generic)
         (error #f "signatures are not coherent"
           generic method (signature generic) (signature method) ) )
+
+      (unless (instance-of? (method-class generic) method)
+        (error #f "invalid method class" generic method) )
+
       (set-methods! generic (cons method (methods generic)))
       (set-effective-function! generic
         (if (eq? <generic> (class-of generic))

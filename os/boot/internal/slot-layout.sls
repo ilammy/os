@@ -108,6 +108,11 @@
                    'init-required: #t
                    'getter:        signature )
 
+        (make-slot 'name:         'method-class
+                   'init-keyword: 'method-class:
+                   'init-value:    <method>
+                   'getter:        method-class )
+
         (make-slot 'name:         'method-combinator
                    'init-keyword: 'method-combinator:
                    'init-thunk:    (lambda () (make <linear-method-combinator>))

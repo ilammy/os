@@ -44,6 +44,8 @@
           generic-name-set!
           generic-signature-ref
           generic-signature-set!
+          generic-method-class-ref
+          generic-method-class-set!
           generic-method-combinator-ref
           generic-method-combinator-set!
           generic-methods-ref
@@ -145,13 +147,15 @@
          generic-name-set! )
       (1 generic-signature-ref
          generic-signature-set! )
-      (2 generic-method-combinator-ref
+      (2 generic-method-class-ref
+         generic-method-class-set! )
+      (3 generic-method-combinator-ref
          generic-method-combinator-set! )
-      (3 generic-methods-ref
+      (4 generic-methods-ref
          generic-methods-set! )
-      (4 generic-effective-function-ref
+      (5 generic-effective-function-ref
          generic-effective-function-set! )
-      (5 generic-significant-positions-ref
+      (6 generic-significant-positions-ref
          generic-significant-positions-set! ) )
 
     (define-primitive-accessors (<method>)
