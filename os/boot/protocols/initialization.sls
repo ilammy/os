@@ -7,6 +7,7 @@
 
   (import (except (rnrs base) assert)
           (rnrs control)
+          (only (srfi :1) any)
           (os predicates)
           (os meta accessors)
           (os internal slot-access)
@@ -61,7 +62,17 @@
       (let ((has-init-value (slot-bound? eslot 'init-value))
             (has-init-thunk (slot-bound? eslot 'init-thunk))
             (init-required  (init-required? eslot))
-            (init-keyword   (init-keyword eslot)) )
+            (init-keyword   (init-keyword eslot))
+            (allocation     (allocation eslot)) )
+
+        (unless (any (lambda (x) (eq? allocation x))
+                  '(instance each-subclass class-lineage virtual) )
+          (error #f "unsupported slot allocation" (name eslot) allocation) )
+
+        (when (and (eq? allocation 'virtual)
+                   (or init-keyword init-required
+                       has-init-value has-init-thunk ) )
+          (error #f "virtual slots cannot have initialization specifiers" (name eslot) initargs) )
 
         (when (and has-init-value has-init-thunk)
           (error #f "slot has both init-value and init-thunk defined" (name eslot) initargs) )

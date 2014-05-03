@@ -68,6 +68,7 @@
              (apply make-effective-slot
                (with-defined-initargs
                  'name:          (slot-name-ref          slot)
+                 'allocation:    (slot-allocation-ref    slot)
                  'init-keyword:  (slot-init-keyword-ref  slot)
                  'init-required: (slot-init-required-ref slot)
                  'init-value:    (slot-init-value-ref    slot)
@@ -89,6 +90,7 @@
 
       (for-each-with-index
         (lambda (index slot)
+          (assert (eq? 'instance (slot-allocation-ref slot)))
           (effective-slot-direct-getter-set! slot (make-getter index))
           (effective-slot-direct-setter-set! slot (make-setter index)) )
         all-slots )

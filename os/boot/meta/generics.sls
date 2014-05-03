@@ -6,6 +6,7 @@
   (export make
             allocate
             initialize
+              initialize-with-initargs-in-class!
 
           slot-ref-in-class
           slot-set-in-class!
@@ -14,9 +15,8 @@
           compute-all-superclasses
           compute-all-slots
             compute-effective-slot
+            install-direct-accessors!
           compute-instance-size
-          finalize-slot-descriptors!
-            compute-direct-slot-accessors
 
           add-method!
             compute-effective-function
@@ -36,6 +36,8 @@
     (predefine-generic make       `((class  ,<class>) . initargs))
     (predefine-generic allocate   `((class  ,<class>)   initargs))
     (predefine-generic initialize `((object ,<object>)  initargs))
+    (predefine-generic initialize-with-initargs-in-class!
+                                  `((class ,<class>) slot object initargs) )
 
     ; protocols/slot-access
     ;
@@ -45,12 +47,11 @@
 
     ; protocols/inheritance
     ;
-    (predefine-generic compute-all-superclasses      `((class ,<class>)))
-    (predefine-generic compute-all-slots             `((class ,<class>)))
-    (predefine-generic compute-effective-slot        `((class ,<class>) slots))
-    (predefine-generic compute-instance-size         `((class ,<class>)))
-    (predefine-generic finalize-slot-descriptors!    `((class ,<class>)))
-    (predefine-generic compute-direct-slot-accessors `((class ,<class>) (slot ,<effective-slot>)))
+    (predefine-generic compute-all-superclasses   `((class ,<class>)))
+    (predefine-generic compute-all-slots          `((class ,<class>)))
+    (predefine-generic compute-effective-slot     `((class ,<class>) slot-groups))
+    (predefine-generic install-direct-accessors!  `((class ,<class>) all-slots))
+    (predefine-generic compute-instance-size      `((class ,<class>)))
 
     ; protocols/generic-calls
     ;

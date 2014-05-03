@@ -12,7 +12,8 @@
           (os internal primitives)
           (os boot meta classes)
           (os boot meta generics)
-          (os boot macros predefine-method) )
+          (os boot macros predefine-method)
+          (os utils slots) )
 
   (begin
 
@@ -36,12 +37,6 @@
       (let* ((slot (find-slot-by-name class slot-name))
              (slot-ref (direct-getter slot)) )
         (if (undefined-slot-value? (slot-ref object)) #f #t) ) )
-
-    (define (find-slot-by-name class slot-name)
-      (let scan ((slots (all-slots class)))
-        (cond ((null? slots) (error #f "unknown slot" (name class) slot-name))
-              ((eq? slot-name (name (car slots))) (car slots))
-              (else (scan (cdr slots))) ) ) )
 
     'dummy
 ) )

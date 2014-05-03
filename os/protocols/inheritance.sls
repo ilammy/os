@@ -6,8 +6,7 @@
   (export compute-all-superclasses
           compute-all-slots
             compute-effective-slot
-          compute-instance-size
-          finalize-slot-descriptors!
-            compute-direct-slot-accessors )
+            install-direct-accessors!
+          compute-instance-size )
 
   (import (os boot meta generics)) )

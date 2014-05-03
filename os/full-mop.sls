@@ -6,6 +6,7 @@
   (export make
             allocate
             initialize
+              initialize-with-initargs-in-class!
 
           slot-ref-in-class
           slot-set-in-class!
@@ -14,9 +15,8 @@
           compute-all-superclasses
           compute-all-slots
             compute-effective-slot
+            install-direct-accessors!
           compute-instance-size
-          finalize-slot-descriptors!
-            compute-direct-slot-accessors
 
           add-method!
             compute-effective-function

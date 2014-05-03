@@ -8,8 +8,9 @@
          primitive-class
          primitive-ref
          primitive-set!
+         make-uninitialized-vector
          undefined-slot-value?
-         
+
          (contract-out
            (set-primitive-write-proc!   (-> (-> primitive? string?) (-> primitive? string?)))
            (set-primitive-display-proc! (-> (-> primitive? string?) (-> primitive? string?))) ) )
@@ -59,12 +60,15 @@
 
 (define (make-primitive class slot-count)
   (primitive class
-    (make-vector slot-count *undefined-slot-value*) ) )
+    (make-uninitialized-vector slot-count) ) )
 
 (define (make-primitive-<class> slot-count)
   (let ([primitive (make-primitive #f slot-count)])
     (set-primitive-class! primitive primitive)
     primitive ) )
+
+(define (make-uninitialized-vector size)
+  (make-vector size *undefined-slot-value*) )
 
 (define (primitive-ref primitive nth)
   (vector-ref (primitive-slots primitive) nth) )

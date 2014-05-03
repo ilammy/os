@@ -19,6 +19,7 @@
           direct-superclasses
           direct-slots
           abstract?
+          allocation
           init-keyword
           init-value
           init-thunk
