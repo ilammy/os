@@ -11,6 +11,8 @@
           class-direct-superclasses-set!
           class-direct-slots-ref
           class-direct-slots-set!
+          class-abstract?-ref
+          class-abstract?-set!
           class-all-superclasses-ref
           class-all-superclasses-set!
           class-all-slots-ref
@@ -107,11 +109,13 @@
          class-direct-superclasses-set! )
       (2 class-direct-slots-ref
          class-direct-slots-set! )
-      (3 class-all-superclasses-ref
+      (3 class-abstract?-ref
+         class-abstract?-set! )
+      (4 class-all-superclasses-ref
          class-all-superclasses-set! )
-      (4 class-all-slots-ref
+      (5 class-all-slots-ref
          class-all-slots-set! )
-      (5 class-instance-size-ref
+      (6 class-instance-size-ref
          class-instance-size-set! ) )
 
     (define-primitive-accessors (<slot> <effective-slot>)

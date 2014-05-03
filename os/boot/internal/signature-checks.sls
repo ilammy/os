@@ -33,19 +33,13 @@
     ;; such classes as valid method specializers for any generic specializer.
     ;;
     ;; For example, <procedure> is such mixin: it can be added to any class to
-    ;; make its instances funcallable. This is used to define <generic> and
-    ;; specialization on <procedure> is used to install proper direct accessors.
-    ;;
-    ;; TODO: At the moment 'mixin' = 'direct and only subclass of <object>'.
-    ;;       This should be refined in future when proper abstract classes are
-    ;;       implemented. Then 'mixin' can be defined as 'any abstract class'.
+    ;; make its instances treated as funcallable ones. This is used to define
+    ;; <generics> and to install proper direct accessors for them.
     ;;
     (define (coherent-specializer? method-specializer generic-specializer)
       (assert (specializer? method-specializer)
               (specializer? generic-specializer) )
-      (or (let ((superclasses (class-all-superclasses-ref method-specializer)))
-            (and (= 1 (length superclasses))
-                 (eq? <object> (car superclasses)) ) )
+      (or (class-abstract?-ref method-specializer)
           (nonstrict-subclass? method-specializer generic-specializer) ) )
 
     (define (signatures-coherent? method generic)

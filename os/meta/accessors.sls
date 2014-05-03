@@ -6,6 +6,7 @@
   (export name
           direct-superclasses
           direct-slots
+          abstract?
           init-keyword
           init-required?
           init-value
@@ -41,6 +42,7 @@
     (def-ref-set name                  name)
     (def-ref-set direct-superclasses   direct-superclasses)
     (def-ref-set direct-slots          direct-slots)
+    (def-ref-set abstract?             abstract?)
     (def-ref-set init-keyword          init-keyword)
     (def-ref-set init-required         init-required?)
     (def-ref-set init-value            init-value)

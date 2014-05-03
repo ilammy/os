@@ -12,6 +12,7 @@
               compute-direct-slot-accessors )
 
   (import (except (rnrs base) assert)
+          (rnrs control)
           (compatibility mlist)
           (only (srfi :1) find list-index every)
           (srfi :69) ; hash-tables
@@ -31,6 +32,10 @@
 
     (predefine-method (initialize call-next-method class initargs) `((class ,<class>) initargs)
       (call-next-method)
+
+      (when (abstract? class)
+        (unless (every abstract? (direct-superclasses class))
+          (error #f "abstract class cannot have concrete superclasses" class) ) )
 
       (set-all-superclasses! class (compute-all-superclasses class))
       (set-all-slots!        class (compute-all-slots class))

@@ -7,6 +7,7 @@
 
   (import (except (rnrs base) assert)
           (rnrs control)
+          (only (srfi :1) every)
           (os internal callables)
           (os internal class-of)
           (os internal primitives)
@@ -42,6 +43,7 @@
            ((name:)                (class-name-set!                class value))
            ((direct-superclasses:) (class-direct-superclasses-set! class value))
            ((direct-slots:)        (class-direct-slots-set!        class value))
+           ((abstract:)            (class-abstract?-set!           class value))
            (else (assert #f msg: "Unknown init keyword used for <class>:" key)) ) )
         initargs )
 
@@ -50,7 +52,16 @@
               msg: "Required slots of a <class> are not initialized" )
 
       (when (undefined-slot-value? (class-name-ref class))
-        (class-name-set! class '<anonymous>) ) )
+        (class-name-set! class '<anonymous>) )
+
+      (when (undefined-slot-value? (class-abstract?-ref class))
+        (class-abstract?-set! class #f) )
+
+      (assert (if (class-abstract?-ref class)
+                  (every class-abstract?-ref
+                    (class-direct-superclasses-ref class) )
+                  #t )
+              msg: "Abstract class cannot have concrete superclasses" ) )
 
     (define (compute-all-class-slots class)
       (map (lambda (slot)

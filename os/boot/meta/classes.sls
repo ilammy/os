@@ -18,19 +18,21 @@
 
   (begin
 
+    (define <class>-instance-size 7)
+
     ;; Metaobject classes
-    (define <class>          (make-primitive-<class> 6))
-    (define <object>         (make-primitive <class> 6))
-    (define <slot>           (make-primitive <class> 6))
-    (define <effective-slot> (make-primitive <class> 6))
-    (define <generic>        (make-primitive <class> 6))
-    (define <method>         (make-primitive <class> 6))
+    (define <class>          (make-primitive-<class> <class>-instance-size))
+    (define <object>         (make-primitive <class> <class>-instance-size))
+    (define <slot>           (make-primitive <class> <class>-instance-size))
+    (define <effective-slot> (make-primitive <class> <class>-instance-size))
+    (define <generic>        (make-primitive <class> <class>-instance-size))
+    (define <method>         (make-primitive <class> <class>-instance-size))
 
     ;; Built-in classes
-    (define <procedure>      (make-primitive <class> 6))
+    (define <procedure>      (make-primitive <class> <class>-instance-size))
 
     ;; Method combinators
-    (define <method-combinator>        (make-primitive <class> 6))
-    (define <linear-method-combinator> (make-primitive <class> 6))
+    (define <method-combinator>        (make-primitive <class> <class>-instance-size))
+    (define <linear-method-combinator> (make-primitive <class> <class>-instance-size))
 
 ) )
