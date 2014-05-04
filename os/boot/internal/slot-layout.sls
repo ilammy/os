@@ -12,7 +12,6 @@
           direct-<generic>-slots
           direct-<method>-slots
           direct-<method-combinator>-slots
-          direct-<linear-method-combinator>-slots
           direct-<standard-method-combinator>-slots )
 
   (import (except (rnrs base) assert)
@@ -121,7 +120,7 @@
 
         (make-slot 'name:         'method-combinator
                    'init-keyword: 'method-combinator:
-                   'init-thunk:    (lambda () (make <linear-method-combinator>))
+                   'init-thunk:    (lambda () (make <standard-method-combinator>))
                    'getter:        method-combinator )
 
         (make-slot 'name:         'methods
@@ -154,8 +153,6 @@
 
     (define direct-<method-combinator>-slots '())
 
-    (define direct-<linear-method-combinator>-slots '())
-
     (define direct-<standard-method-combinator>-slots '())
 
     (define all-<object>-slots         direct-<object>-slots)
@@ -168,8 +165,6 @@
 
     (define all-<method-combinator>-slots
         (append all-<object>-slots direct-<method-combinator>-slots) )
-    (define all-<linear-method-combinator>-slots
-        (append all-<method-combinator>-slots direct-<linear-method-combinator>-slots) )
     (define all-<standard-method-combinator>-slots
         (append all-<method-combinator>-slots direct-<standard-method-combinator>-slots) )
 
@@ -182,7 +177,6 @@
             ((eq? class <generic>)                    all-<generic>-slots)
             ((eq? class <method>)                     all-<method>-slots)
             ((eq? class <method-combinator>)          all-<method-combinator>-slots)
-            ((eq? class <linear-method-combinator>)   all-<linear-method-combinator>-slots)
             ((eq? class <standard-method-combinator>) all-<standard-method-combinator>-slots)
             (else (assert #f msg: (class-name-ref class) "not accounted in all-slots-of")) ) )
 

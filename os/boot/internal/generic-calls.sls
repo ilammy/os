@@ -4,9 +4,10 @@
   ;   Defining predefined methods
   ;
   (export generic-add-method!
-          compute-effective-function:<generic>
-          find-applicable-methods:<generic>
-          compute-method-function:<method> )
+          compute-effective-method:<standard>
+          safe:compute-effective-function
+          safe:find-applicable-methods
+          safe:compute-method-function )
 
   (import (except (rnrs base) assert)
           (rnrs lists)
@@ -19,7 +20,7 @@
           (os boot meta accessors)
           (os boot meta classes)
           (os boot internal signature-checks)
-          (only (os protocols generic-calls) compute-method-function)
+          (os protocols generic-calls)
           (os utils assert)
           (os utils misc) )
 
@@ -33,23 +34,29 @@
                 msg: "Signatures for" (generic-name-ref generic) "are not coherent:"
                      (method-signature-ref method)
                      (generic-signature-ref generic) )
+        (assert (eq? <standard-method-combinator>
+                     (class-of (generic-method-combinator-ref generic)) )
+                msg: "Method combinator"
+                     (class-name-ref (class-of (generic-method-combinator-ref generic)))
+                     "is not expected for predefined generic function"
+                     (generic-name-ref generic) )
         (assert (eq? <method> (generic-method-class-ref generic)))
         (generic-methods-set! generic (cons method (generic-methods-ref generic)))
         (generic-effective-function-set! generic
           (compute-effective-function:<generic> generic) ) ) )
 
+    (define (safe:compute-effective-function generic)
+      (if (eq? <generic> (class-of generic))
+          (compute-effective-function:<generic> (object-of generic))
+          (compute-effective-function generic) ) )
+
     (define (compute-effective-function:<generic> generic)
       (assert (eq? <generic> (class-of generic)))
-      (assert (eq? <linear-method-combinator>
-                   (class-of (generic-method-combinator-ref generic)) )
-              msg: "Method combinator"
-                   (class-name-ref (class-of (generic-method-combinator-ref generic)))
-                   "is not expected for predefined generic function"
-                   (generic-name-ref generic) )
       (lambda args
         (let* ((arg-classes (map class-of (significant-args generic args)))
                (applicable-methods (find-applicable-methods:<generic> generic arg-classes))
-               (effective-method (effective-method applicable-methods)) )
+               (combinator (generic-method-combinator-ref generic))
+               (effective-method (safe:compute-effective-method combinator applicable-methods)) )
           (effective-method args) ) ) )
 
     (define (significant-args generic args)
@@ -62,6 +69,11 @@
       (map (lambda (index) (list-ref args index))
         (generic-significant-positions-ref generic) ) )
 
+    (define (safe:find-applicable-methods generic arg-classes)
+      (if (eq? <generic> (class-of generic))
+          (find-applicable-methods:<generic> (object-of generic) arg-classes)
+          (find-applicable-methods generic arg-classes) ) )
+
     (define (find-applicable-methods:<generic> generic arg-classes)
       (assert (eq? <generic> (class-of generic)))
       (let ((all-methods    (generic-methods-ref generic))
@@ -70,42 +82,36 @@
         (list-sort more-specific? (filter applicable? all-methods)) ) )
 
     (define (method-applicable? method arg-classes)
-      (every nonstrict-subclass?
-        arg-classes
-        (discriminators method) ) )
+      (every nonstrict-subclass? arg-classes (discriminators method)) )
 
-    ; lhs < rhs
-    (define (more-specific-method? left-method right-method argument-classes)
-      (assert (= (length (discriminators left-method))
-                 (length (discriminators right-method))
-                 (length argument-classes) ))
-      (let loop ((L (discriminators left-method))
-                 (R (discriminators right-method))
-                 (A argument-classes) )
-        (cond ((null? L) #f)
-              ((eq? (car L) (car R))
-               (loop (cdr L)
-                     (cdr R)
-                     (cdr A) ) )
-              ((subclass? (car L)
-                          (car R) ) #t)
-              ((memq (car R)
-                     (memq (car L)
-                           (all-superclasses (car A)) ) ) #t)
-              (else (loop (cdr L)
-                          (cdr R)
-                          (cdr A) )) ) ) )
+    (define (safe:compute-effective-method combinator applicable-methods)
+      (if (eq? <standard-method-combinator> (class-of combinator))
+          (compute-effective-method:<standard> applicable-methods)
+          (compute-effective-method combinator applicable-methods) ) )
 
-    ; always linear combinator
-    (define (effective-method methods)
-      (if (null? methods) (error #f "no applicable methods")
-          (let ((methods (map (lambda (method)
-                                (if (eq? <method> (class-of method))
-                                    (compute-method-function:<method> method)
-                                    (compute-method-function method) ) )
-                           methods )))
-            (lambda (args)
-              ((car methods) (cdr methods) args) ) ) ) )
+    (define (compute-effective-method:<standard> methods)
+      (define (with-qualifier a-qualifier)
+        (lambda (method)
+          (memq a-qualifier (qualifiers method)) ) )
+
+      (define (without-qualifiers method)
+        (null? (qualifiers method)) )
+
+      (let ((arounds   (filter (with-qualifier 'around) methods))
+            (befores   (filter (with-qualifier 'before) methods))
+            (afters    (filter (with-qualifier 'after)  methods))
+            (primaries (filter without-qualifiers       methods)) )
+        (if (null? primaries) (error #f "no applicable primary methods")
+            (let ((methods (map safe:compute-method-function
+                             (append arounds befores primaries
+                                     (reverse afters) ) )))
+              (lambda (args)
+                ((car methods) (cdr methods) args) ) ) ) ) )
+
+    (define (safe:compute-method-function method)
+      (if (eq? <method> (class-of method))
+          (compute-method-function:<method> method)
+          (compute-method-function method) ) )
 
     (define (compute-method-function:<method> method)
       (assert (eq? <method> (class-of method)))

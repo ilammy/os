@@ -9,7 +9,6 @@
           <generic>
           <method>
           <method-combinator>
-          <linear-method-combinator>
           <standard-method-combinator> )
 
   (import (except (rnrs base) assert)
@@ -43,8 +42,6 @@
 
     (init-class! <method-combinator> (<object>) abstract
       direct-<method-combinator>-slots )
-    (init-class! <linear-method-combinator> (<method-combinator>)
-      direct-<linear-method-combinator>-slots )
     (init-class! <standard-method-combinator> (<method-combinator>)
       direct-<standard-method-combinator>-slots )
 

@@ -17,12 +17,12 @@
 
   (begin
 
-    (define <generic>-instance-size                  7)
-    (define <linear-method-combinator>-instance-size 0)
+    (define <generic>-instance-size                    7)
+    (define <standard-method-combinator>-instance-size 0)
 
     (define (make-default-method-combinator)
-      (make-primitive <linear-method-combinator>
-                      <linear-method-combinator>-instance-size ) )
+      (make-primitive <standard-method-combinator>
+                      <standard-method-combinator>-instance-size ) )
 
     (define (make-generic . initargs)
       (let ((generic (make-primitive <generic> <generic>-instance-size)))

@@ -38,17 +38,12 @@
         (error #f "invalid method class" generic method) )
 
       (set-methods! generic (cons method (methods generic)))
-      (set-effective-function! generic
-        (if (eq? <generic> (class-of generic))
-            (compute-effective-function:<generic> (object-of generic))
-            (compute-effective-function generic) ) ) )
+      (set-effective-function! generic (safe:compute-effective-function generic)) )
 
     (predefine-method (compute-effective-function $ generic) `((generic ,<generic>))
       (lambda args
         (let* ((arg-classes (map class-of (significant-args generic args)))
-               (applicable-methods (if (eq? <generic> (class-of generic))
-                                       (find-applicable-methods:<generic> (object-of generic) arg-classes)
-                                       (find-applicable-methods generic arg-classes) ))
+               (applicable-methods (safe:find-applicable-methods generic arg-classes))
                (combinator (method-combinator generic))
                (effective-method (compute-effective-method combinator applicable-methods)) )
           (effective-method args) ) ) )
@@ -96,15 +91,8 @@
                           (cdr A) )) ) ) )
 
     (predefine-method (compute-effective-method $ combinator methods)
-                      `((combinator ,<linear-method-combinator>) methods)
-      (if (null? methods) (error #f "no applicable methods")
-          (let ((methods (map (lambda (method)
-                                (if (eq? <method> (class-of method))
-                                    (compute-method-function:<method> method)
-                                    (compute-method-function method) ) )
-                           methods )))
-            (lambda (args)
-              ((car methods) (cdr methods) args) ) ) ) )
+                      `((combinator ,<standard-method-combinator>) methods)
+      (compute-effective-method:<standard> methods) )
 
     (predefine-method (compute-method-function $ method) `((method ,<method>))
       (let ((method-body (method-body method)))

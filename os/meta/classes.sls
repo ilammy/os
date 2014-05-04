@@ -11,7 +11,6 @@
           <method>
           <procedure>
           <method-combinator>
-          <linear-method-combinator>
           <standard-method-combinator> )
 
   (import (os boot meta classes)) )
