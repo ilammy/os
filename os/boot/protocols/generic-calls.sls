@@ -111,7 +111,9 @@
         (lambda (next-methods args)
           (apply method-body
            (if (null? next-methods) #f
-               (lambda () ((car next-methods) (cdr next-methods) args)) )
+               (case-lambda
+                 (()   ((car next-methods) (cdr next-methods) args))
+                 (args ((car next-methods) (cdr next-methods) args)) ) )
            args ) ) ) )
 
   'dummy
