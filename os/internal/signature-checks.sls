@@ -44,6 +44,7 @@
       (let loop ((ms (signature method))
                  (gs (signature generic)) )
         (cond ((or (both null? ms gs) (both symbol? ms gs))    #t)
+              ((xor (null? ms) (null? gs))                     #f)
               ((both symbol? (car ms) (car gs))                (loop (cdr ms) (cdr gs)))
               ((and (both list? (car ms) (car gs))
                     (coherent-specializer? (cadr (car ms))

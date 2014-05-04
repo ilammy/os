@@ -9,7 +9,8 @@
           proper-length
           proper-filter-map
           implies
-          both )
+          both
+          xor )
 
   (import (except (rnrs base) assert)
           (rnrs control)
@@ -73,5 +74,7 @@
     (define (implies premise consequence) (or (not premise) consequence))
 
     (define (both p a b) (and (p a) (p b)))
+
+    (define (xor p q) (and (or p q) (not (and p q))))
 
 ) )
