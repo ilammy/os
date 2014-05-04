@@ -59,6 +59,8 @@
 
           method-signature-ref
           method-signature-set!
+          method-qualifiers-ref
+          method-qualifiers-set!
           method-body-ref
           method-body-set!
           method-discriminators-ref
@@ -165,9 +167,11 @@
     (define-primitive-accessors (<method>)
       (0 method-signature-ref
          method-signature-set! )
-      (1 method-body-ref
+      (1 method-qualifiers-ref
+         method-qualifiers-set! )
+      (2 method-body-ref
          method-body-set! )
-      (2 method-discriminators-ref
+      (3 method-discriminators-ref
          method-discriminators-set! ) )
 
 ) )

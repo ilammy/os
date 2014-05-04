@@ -18,6 +18,7 @@
           method-class
           method-combinator
           method-body
+          qualifiers
           all-superclasses      set-all-superclasses!
           all-slots             set-all-slots!
           instance-size         set-instance-size!
@@ -56,6 +57,7 @@
     (def-ref-set method-class          method-class)
     (def-ref-set method-combinator     method-combinator)
     (def-ref-set method-body           method-body)
+    (def-ref-set qualifiers            qualifiers)
 
     (def-ref-set all-superclasses      all-superclasses      set-all-superclasses!)
     (def-ref-set all-slots             all-slots             set-all-slots!)

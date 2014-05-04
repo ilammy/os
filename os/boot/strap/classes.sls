@@ -9,7 +9,8 @@
           <generic>
           <method>
           <method-combinator>
-          <linear-method-combinator> )
+          <linear-method-combinator>
+          <standard-method-combinator> )
 
   (import (except (rnrs base) assert)
           (os boot meta classes)
@@ -44,5 +45,7 @@
       direct-<method-combinator>-slots )
     (init-class! <linear-method-combinator> (<method-combinator>)
       direct-<linear-method-combinator>-slots )
+    (init-class! <standard-method-combinator> (<method-combinator>)
+      direct-<standard-method-combinator>-slots )
 
 ) )

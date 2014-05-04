@@ -11,7 +11,8 @@
           <method>
           <procedure>
           <method-combinator>
-          <linear-method-combinator> )
+          <linear-method-combinator>
+          <standard-method-combinator> )
 
   (import (except (rnrs base) assert)
           (os internal primitives) )
@@ -32,7 +33,8 @@
     (define <procedure>      (make-primitive <class> <class>-instance-size))
 
     ;; Method combinators
-    (define <method-combinator>        (make-primitive <class> <class>-instance-size))
-    (define <linear-method-combinator> (make-primitive <class> <class>-instance-size))
+    (define <method-combinator>          (make-primitive <class> <class>-instance-size))
+    (define <linear-method-combinator>   (make-primitive <class> <class>-instance-size))
+    (define <standard-method-combinator> (make-primitive <class> <class>-instance-size))
 
 ) )

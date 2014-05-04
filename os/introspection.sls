@@ -14,6 +14,7 @@
           <procedure>
           <method-combinator>
           <linear-method-combinator>
+          <standard-method-combinator>
 
           name
           direct-superclasses
