@@ -16,7 +16,7 @@
 
   (begin
 
-    (define <method>-instance-size 3)
+    (define <method>-instance-size 4)
 
     (define (make-method . initargs)
       (let ((method (make-primitive <method> <method>-instance-size)))
@@ -37,6 +37,8 @@
               msg: "Required slots of a <method> are not initialized" )
 
       (assert (valid-signature? (method-signature-ref method)))
+
+      (method-qualifiers-set! method '())
 
       (method-discriminators-set! method
         (filter-discriminators (method-signature-ref method)) ) )

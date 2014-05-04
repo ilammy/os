@@ -12,7 +12,7 @@
           direct-<generic>-slots
           direct-<method>-slots
           direct-<method-combinator>-slots
-          direct-<linear-method-combinator>-slots )
+          direct-<standard-method-combinator>-slots )
 
   (import (except (rnrs base) assert)
           (os meta accessors)
@@ -120,7 +120,7 @@
 
         (make-slot 'name:         'method-combinator
                    'init-keyword: 'method-combinator:
-                   'init-thunk:    (lambda () (make <linear-method-combinator>))
+                   'init-thunk:    (lambda () (make <standard-method-combinator>))
                    'getter:        method-combinator )
 
         (make-slot 'name:         'methods
@@ -138,6 +138,11 @@
                    'init-required: #t
                    'getter:        signature )
 
+        (make-slot 'name:         'qualifiers
+                   'init-keyword: 'qualifiers:
+                   'init-value:   '()
+                   'getter:        qualifiers )
+
         (make-slot 'name:         'method-body
                    'init-keyword: 'method-body:
                    'init-required: #t )
@@ -148,7 +153,7 @@
 
     (define direct-<method-combinator>-slots '())
 
-    (define direct-<linear-method-combinator>-slots '())
+    (define direct-<standard-method-combinator>-slots '())
 
     (define all-<object>-slots         direct-<object>-slots)
     (define all-<class>-slots          (append all-<object>-slots direct-<class>-slots))
@@ -158,20 +163,21 @@
     (define all-<generic>-slots        (append all-<object>-slots direct-<generic>-slots))
     (define all-<method>-slots         (append all-<object>-slots direct-<method>-slots))
 
-    (define all-<method-combinator>-slots        (append all-<object>-slots
-                                                         direct-<method-combinator>-slots ))
-    (define all-<linear-method-combinator>-slots (append all-<method-combinator>-slots
-                                                         direct-<linear-method-combinator>-slots ))
+    (define all-<method-combinator>-slots
+        (append all-<object>-slots direct-<method-combinator>-slots) )
+    (define all-<standard-method-combinator>-slots
+        (append all-<method-combinator>-slots direct-<standard-method-combinator>-slots) )
+
     (define (all-slots-of class)
-      (cond ((eq? class <object>)                   all-<object>-slots)
-            ((eq? class <class>)                    all-<class>-slots)
-            ((eq? class <slot>)                     all-<slot>-slots)
-            ((eq? class <effective-slot>)           all-<effective-slot>-slots)
-            ((eq? class <procedure>)                all-<procedure>-slots)
-            ((eq? class <generic>)                  all-<generic>-slots)
-            ((eq? class <method>)                   all-<method>-slots)
-            ((eq? class <method-combinator>)        all-<method-combinator>-slots)
-            ((eq? class <linear-method-combinator>) all-<linear-method-combinator>-slots)
+      (cond ((eq? class <object>)                     all-<object>-slots)
+            ((eq? class <class>)                      all-<class>-slots)
+            ((eq? class <slot>)                       all-<slot>-slots)
+            ((eq? class <effective-slot>)             all-<effective-slot>-slots)
+            ((eq? class <procedure>)                  all-<procedure>-slots)
+            ((eq? class <generic>)                    all-<generic>-slots)
+            ((eq? class <method>)                     all-<method>-slots)
+            ((eq? class <method-combinator>)          all-<method-combinator>-slots)
+            ((eq? class <standard-method-combinator>) all-<standard-method-combinator>-slots)
             (else (assert #f msg: (class-name-ref class) "not accounted in all-slots-of")) ) )
 
 ) )
