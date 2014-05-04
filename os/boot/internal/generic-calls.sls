@@ -10,6 +10,7 @@
           safe:compute-method-function )
 
   (import (except (rnrs base) assert)
+          (rnrs control)
           (rnrs lists)
           (only (srfi :1) first every)
           (only (rnrs sorting) list-sort)
@@ -119,7 +120,9 @@
         (lambda (next-methods args)
           (apply method-body
            (if (null? next-methods) #f
-               (lambda () ((car next-methods) (cdr next-methods) args)) )
+               (case-lambda
+                 (()   ((car next-methods) (cdr next-methods) args))
+                 (args ((car next-methods) (cdr next-methods) args)) ) )
            args ) ) ) )
 
 ) )
